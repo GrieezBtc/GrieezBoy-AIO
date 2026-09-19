@@ -71,13 +71,13 @@ export function HistoryView() {
         </button>
       </div>
 
-      <ul className="grid gap-2">
+      <ul className="grid min-w-0 gap-2">
         {entries.map((entry) => {
           const platform = PLATFORM_MAP[entry.platform];
           return (
             <li
               key={entry.id}
-              className="flex flex-col gap-3 border border-line bg-[color-mix(in_srgb,var(--panel-solid)_58%,transparent)] p-2.5 sm:flex-row sm:items-center"
+              className="flex min-w-0 w-full flex-col gap-3 overflow-hidden border border-line bg-[color-mix(in_srgb,var(--panel-solid)_58%,transparent)] p-2.5 sm:flex-row sm:items-center"
             >
               {entry.thumbnailUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -86,7 +86,7 @@ export function HistoryView() {
                   alt=""
                   loading="lazy"
                   decoding="async"
-                  className="h-24 w-full shrink-0 border border-line object-cover sm:h-14 sm:w-24"
+                  className="h-24 w-full max-w-full shrink-0 border border-line object-cover sm:h-14 sm:w-24"
                 />
               ) : (
                 <span className="grid h-14 w-full shrink-0 place-items-center border border-line text-[0.6rem] text-faint sm:w-24">
@@ -112,11 +112,11 @@ export function HistoryView() {
                 </p>
               </div>
 
-              <div className="flex shrink-0 gap-2">
+              <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:w-auto sm:shrink-0">
                 <button
                   type="button"
                   onClick={() => router.push(`/?url=${encodeURIComponent(entry.url)}`)}
-                  className="btn flex-1 px-3 text-[0.6rem] sm:flex-none"
+                  className="btn min-w-0 px-3 text-[0.6rem] sm:flex-none"
                 >
                   <span aria-hidden>↻</span> Retry
                 </button>
