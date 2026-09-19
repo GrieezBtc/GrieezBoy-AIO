@@ -1,0 +1,37 @@
+{
+  "name": "GRIEEZBOY AIO — Multi-Source Media Engine",
+  "short_name": "GRIEEZBOY",
+  "description": "One engine, seven platforms. Paste a link, execute, download.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#07080a",
+  "theme_color": "#07080a",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Downloader", "url": "/" },
+    { "name": "Video Hub", "url": "/video-hub" },
+    { "name": "Activity Log", "url": "/history" }
+  ]
+}
