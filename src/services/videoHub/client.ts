@@ -5,45 +5,14 @@ import type { HubResolved, HubResponse } from "./types";
 
 const HUB_TIMEOUT_MS = 15_000;
 
-function readEndpoint(): string | null {
-  const endpoint = process.env.VIDEO_HUB_ENDPOINT?.trim();
-  return endpoint ? endpoint : null;
-}
+const SEARCH_ENDPOINT =
+  "https://apis.davidcyril.name.ng/xxx/xnxx";
 
-export function isHubLive(): boolean {
-  return readEndpoint() !== null;
-}
+const DOWNLOAD_ENDPOINT =
+  "https://apis.davidcyril.name.ng/download/xnxx";
 
-/**
- * Single place that knows the hub request contract.
- * Supports `{query}` / `{page}` placeholders, otherwise appends query params.
- */
-function buildHubUrl(endpoint: string, query: string, page: number): string {
-  if (endpoint.includes("{query}") || endpoint.includes("{page}")) {
-    return endpoint
-      .replace("{query}", encodeURIComponent(query))
-      .replace("{page}", String(page));
-  }
-  const url = new URL(endpoint);
-  if (query) url.searchParams.set("q", query);
-  url.searchParams.set("page", String(page));
-  return url.toString();
-}
-
-function hubHeaders(): Record<string, string> {
-  const headers: Record<string, string> = { accept: "application/json" };
-  const key = process.env.RAPIDAPI_KEY?.trim();
-  const endpoint = readEndpoint();
-  // Only attach credentials when the hub is hosted behind the same gateway.
-  if (key && endpoint && /rapidapi\.com|rapidapi\.io/.test(endpoint)) {
-    headers["x-rapidapi-key"] = key;
-    try {
-      headers["x-rapidapi-host"] = new URL(endpoint).host;
-    } catch {
-      /* ignore */
-    }
-  }
-  return headers;
+function readLiveMode(): boolean {
+  return process.env.VIDEO_HUB_LIVE !== "false";
 }
 
 async function requestJson(
@@ -52,27 +21,55 @@ async function requestJson(
 ): Promise<{ ok: boolean; status: number; body: unknown }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), HUB_TIMEOUT_MS);
+
   const onAbort = () => controller.abort();
   signal?.addEventListener("abort", onAbort);
+
   try {
     const response = await fetch(input, {
       method: "GET",
-      headers: hubHeaders(),
-      signal: controller.signal,
+      headers: {
+        accept: "application/json",
+      },
       cache: "no-store",
+      signal: controller.signal,
     });
+
     const text = await response.text();
+
     let body: unknown = text;
+
     try {
       body = JSON.parse(text);
     } catch {
       /* keep raw text */
     }
-    return { ok: response.ok, status: response.status, body };
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      body,
+    };
   } finally {
     clearTimeout(timeout);
     signal?.removeEventListener("abort", onAbort);
   }
+}
+
+function buildSearchUrl(query: string, page: number): string {
+  const url = new URL(SEARCH_ENDPOINT);
+
+  url.searchParams.set("q", query);
+
+  if (page > 0) {
+    url.searchParams.set("page", String(page + 1));
+  }
+
+  return url.toString();
+}
+
+export function isHubLive(): boolean {
+  return readLiveMode();
 }
 
 export async function fetchHubFeed(options: {
@@ -80,88 +77,164 @@ export async function fetchHubFeed(options: {
   page: number;
   signal?: AbortSignal;
 }): Promise<HubResponse> {
-  const query = options.query.slice(0, 120);
-  const page = Number.isFinite(options.page) ? Math.max(0, Math.floor(options.page)) : 0;
-  const endpoint = readEndpoint();
+  const query = options.query.trim().slice(0, 120);
+  const page = Number.isFinite(options.page)
+    ? Math.max(0, Math.floor(options.page))
+    : 0;
 
-  if (!endpoint) {
+  if (!query) {
+    return normalizeHubFeed(
+      {
+        creator: "David Cyril",
+        success: true,
+        data: {
+          page: 1,
+          totalResults: 0,
+          totalPages: 0,
+          results: [],
+        },
+      },
+      { query, page },
+    );
+  }
+
+  if (!readLiveMode()) {
     await new Promise((resolve) => setTimeout(resolve, 420));
-    return normalizeHubFeed(mockHubUpstream(query, page), { query, page });
+
+    return normalizeHubFeed(mockHubUpstream(query, page), {
+      query,
+      page,
+    });
   }
 
   try {
     const { ok, status, body } = await requestJson(
-      buildHubUrl(endpoint, query, page),
+      buildSearchUrl(query, page),
       options.signal,
     );
+
     if (!ok) {
       if (status === 429) return hubError("RATE_LIMITED");
       if (status === 404) return hubError("NOT_FOUND");
       if (status === 408 || status === 504) return hubError("TIMEOUT");
+
       return hubError("UPSTREAM_ERROR");
     }
-    return normalizeHubFeed(body, { query, page });
+
+    return normalizeHubFeed(body, {
+      query,
+      page,
+    });
   } catch (error) {
     const name = (error as { name?: string } | null)?.name;
-    if (name === "AbortError" || name === "TimeoutError") return hubError("TIMEOUT");
+
+    if (name === "AbortError" || name === "TimeoutError") {
+      return hubError("TIMEOUT");
+    }
+
     return hubError("NETWORK_ERROR");
   }
 }
 
-/** Separate resolver: turns a hub entry id into a playable stream URL. */
+/**
+ * Resolves an XNXX search-result URL through the download API.
+ *
+ * The search API gives us the source URL. That exact URL is sent to:
+ * /download/xnxx?url=<source URL>
+ */
 export async function resolveHubStream(options: {
-  id: string;
+  url: string;
   signal?: AbortSignal;
 }): Promise<HubResolved> {
-  const id = options.id.trim().slice(0, 200);
-  if (!id) return hubError("BAD_QUERY");
-  const endpoint = readEndpoint();
+  const sourceUrl = options.url.trim().slice(0, 2000);
 
-  const toResolved = (raw: unknown): HubResolved => {
-    if (typeof raw !== "object" || raw === null) return hubError("MALFORMED_RESPONSE");
-    const rec = raw as Record<string, unknown>;
-    const candidates = ["stream_url", "streamUrl", "hls", "playback_url", "url", "video_url"];
-    let url: string | undefined;
-    for (const key of candidates) {
-      const value = rec[key];
-      if (isSafeMediaUrl(value)) {
-        url = value.trim();
-        break;
-      }
+  try {
+    const parsed = new URL(sourceUrl);
+
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return hubError("BAD_QUERY");
     }
-    if (!url) return hubError("NOT_FOUND");
-    const download = rec.download_url ?? rec.downloadUrl;
-    const expires = rec.expires_at ?? rec.expiresAt;
-    return {
-      success: true,
-      id,
-      playback: {
-        url,
-        type: url.split(/[?#]/)[0].toLowerCase().endsWith(".m3u8") ? "hls" : "mp4",
-      },
-      ...(isSafeMediaUrl(download) ? { downloadUrl: download.trim() } : {}),
-      ...(typeof expires === "string" ? { expiresAt: expires } : {}),
-    };
-  };
+  } catch {
+    return hubError("BAD_QUERY");
+  }
 
-  if (!endpoint) {
+  if (!readLiveMode()) {
     await new Promise((resolve) => setTimeout(resolve, 220));
-    return toResolved(mockHubResolve(id));
+
+    return toResolved(mockHubResolve(sourceUrl), sourceUrl);
   }
 
   try {
-    const url = new URL(endpoint.replace(/\{query\}|\{page\}/g, ""));
-    url.searchParams.set("id", id);
-    const { ok, status, body } = await requestJson(url.toString(), options.signal);
+    const url = new URL(DOWNLOAD_ENDPOINT);
+    url.searchParams.set("url", sourceUrl);
+
+    const { ok, status, body } = await requestJson(
+      url.toString(),
+      options.signal,
+    );
+
     if (!ok) {
       if (status === 429) return hubError("RATE_LIMITED");
       if (status === 404) return hubError("NOT_FOUND");
+      if (status === 408 || status === 504) return hubError("TIMEOUT");
+
       return hubError("UPSTREAM_ERROR");
     }
-    return toResolved(body);
+
+    return toResolved(body, sourceUrl);
   } catch (error) {
     const name = (error as { name?: string } | null)?.name;
-    if (name === "AbortError" || name === "TimeoutError") return hubError("TIMEOUT");
+
+    if (name === "AbortError" || name === "TimeoutError") {
+      return hubError("TIMEOUT");
+    }
+
     return hubError("NETWORK_ERROR");
   }
+}
+
+function toResolved(raw: unknown, id: string): HubResolved {
+  if (typeof raw !== "object" || raw === null) {
+    return hubError("MALFORMED_RESPONSE");
+  }
+
+  const root = raw as Record<string, unknown>;
+  const result =
+    typeof root.result === "object" && root.result !== null
+      ? (root.result as Record<string, unknown>)
+      : undefined;
+
+  if (root.status === false || !result) {
+    return hubError("MALFORMED_RESPONSE");
+  }
+
+  const download =
+    typeof result.download === "object" && result.download !== null
+      ? (result.download as Record<string, unknown>)
+      : undefined;
+
+  const candidates = [
+    download?.high_quality,
+    download?.low_quality,
+  ];
+
+  const playbackUrl = candidates.find((value) =>
+    isSafeMediaUrl(value),
+  );
+
+  if (!playbackUrl || typeof playbackUrl !== "string") {
+    return hubError("NOT_FOUND");
+  }
+
+  const url = playbackUrl.trim();
+
+  return {
+    success: true,
+    id,
+    playback: {
+      url,
+      type: "mp4",
+    },
+    downloadUrl: url,
+  };
 }

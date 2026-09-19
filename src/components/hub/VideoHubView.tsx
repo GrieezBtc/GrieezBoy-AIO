@@ -20,8 +20,12 @@ export function VideoHubView() {
   const [error, setError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   const [active, setActive] = useState<HubVideo | null>(null);
+  const [generatedVideo, setGeneratedVideo] = useState<HubVideo | null>(null);
+  const [generatedLoading, setGeneratedLoading] = useState(true);
+  const [generatedError, setGeneratedError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
+  const generatedAbortRef = useRef<AbortController | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const requestedRef = useRef<string>("");
 
@@ -104,6 +108,84 @@ export function VideoHubView() {
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
+  const loadGeneratedVideo = useCallback(async () => {
+    generatedAbortRef.current?.abort();
+
+    const controller = new AbortController();
+    generatedAbortRef.current = controller;
+
+    setGeneratedLoading(true);
+    setGeneratedError(null);
+
+    try {
+      const response = await fetch("/api/video-hub/stellaplus", {
+        signal: controller.signal,
+        cache: "no-store",
+      });
+
+      const payload = (await response.json()) as
+        | {
+            success: true;
+            video: {
+              title: string;
+              thumbnail: string;
+              playback: {
+                url: string;
+                type: "mp4";
+              };
+              downloadUrl: string;
+              sourceUrl: string;
+            };
+          }
+        | {
+            success: false;
+            error?: {
+              message?: string;
+            };
+          };
+
+      if (!response.ok || !payload.success) {
+        throw new Error(
+          !payload.success
+            ? payload.error?.message ?? "Unable to load a generated video."
+            : "Unable to load a generated video.",
+        );
+      }
+
+      setGeneratedVideo({
+        id: `stellaplus-${Date.now()}`,
+        title: payload.video.title,
+        thumbnailUrl: payload.video.thumbnail,
+        sourceUrl: payload.video.sourceUrl,
+        tags: ["stellaplus"],
+        playback: {
+          url: payload.video.playback.url,
+          type: "mp4",
+          needsResolve: false,
+        },
+        downloadUrl: payload.video.downloadUrl,
+      });
+    } catch (caught) {
+      if ((caught as { name?: string })?.name === "AbortError") return;
+
+      setGeneratedError(
+        caught instanceof Error
+          ? caught.message
+          : "Unable to load a generated video.",
+      );
+    } finally {
+      if (!controller.signal.aborted) {
+        setGeneratedLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadGeneratedVideo();
+
+    return () => generatedAbortRef.current?.abort();
+  }, [loadGeneratedVideo]);
+
   /* infinite loading */
   useEffect(() => {
     const node = sentinelRef.current;
@@ -164,6 +246,60 @@ export function VideoHubView() {
 
   return (
     <div className="space-y-5">
+      <section className="panel p-3 sm:p-4" aria-labelledby="generated-video-title">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="t-label">StellaPlus</p>
+            <h2 id="generated-video-title" className="mt-1 text-sm font-bold tracking-[0.08em]">
+              Generated video
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => void loadGeneratedVideo()}
+            disabled={generatedLoading}
+            className="btn self-start px-4 sm:self-auto"
+          >
+            <span aria-hidden>↻</span>
+            {generatedLoading ? "Loading…" : "New video"}
+          </button>
+        </div>
+
+        {generatedError ? (
+          <div
+            role="alert"
+            className="flex flex-col gap-3 border p-3 sm:flex-row sm:items-center sm:justify-between"
+            style={{
+              borderColor:
+                "color-mix(in srgb, var(--danger) 55%, transparent)",
+            }}
+          >
+            <p className="text-[0.76rem] text-dim">{generatedError}</p>
+            <button
+              type="button"
+              onClick={() => void loadGeneratedVideo()}
+              className="btn px-4"
+            >
+              Retry
+            </button>
+          </div>
+        ) : generatedLoading ? (
+          <div className="grid grid-cols-1">
+            <VideoCardSkeleton />
+          </div>
+        ) : generatedVideo ? (
+          <div className="max-w-3xl">
+            <VideoCard
+              video={generatedVideo}
+              onWatch={setActive}
+              onShare={(target) => void share(target)}
+              onDownload={download}
+            />
+          </div>
+        ) : null}
+      </section>
+
       <form
         role="search"
         onSubmit={(event) => event.preventDefault()}

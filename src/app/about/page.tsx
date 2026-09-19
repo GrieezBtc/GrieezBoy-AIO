@@ -5,13 +5,13 @@ import { PLATFORMS } from "@/services/aioDownloader/platforms";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "How the GRIEEZBOY AIO engine is architected: one AIO endpoint, one normalizer, a separate video hub.",
+    "Learn how GRIEEZBOY AIO keeps media downloads simple, fast and consistent.",
 };
 
 const SECTIONS = [
   {
-    title: "One engine, one contract",
-    body: "Every supported platform is resolved through a single server-side AIO endpoint. The browser posts { url } to /api/download and receives a strictly normalized payload — never the raw upstream response.",
+    title: "One engine, one simple flow",
+    body: "Paste a supported link and let the engine handle the processing. You get a clean, consistent result without complicated steps or technical details.",
   },
   {
     title: "Normalization first",
@@ -22,8 +22,8 @@ const SECTIONS = [
     body: "The Video Hub is a distinct module with its own endpoint, adapter and data model. The two systems never share clients, types or responses.",
   },
   {
-    title: "Keys stay on the server",
-    body: "RapidAPI credentials are read from environment variables inside route handlers only. No secret is ever bundled into client JavaScript, and upstream errors are mapped to safe, human error codes.",
+    title: "Fast, consistent results",
+    body: "Built to keep the experience quick, clear and reliable across supported platforms, with every result presented in a simple, consistent format.",
   },
 ];
 

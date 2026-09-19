@@ -79,7 +79,7 @@ export function normalizeHubVideo(raw: unknown, index: number): HubVideo | null 
     str(pick(raw, ["id", "video_id", "videoId", "uuid", "slug", "hash"])) ??
     `hub-${index}-${title.slice(0, 24).replace(/\W+/g, "-").toLowerCase()}`;
 
-  const thumbnailUrl = firstUrl(raw, [
+  const thumbnailRaw = pick(raw, [
     "thumbnail",
     "thumbnail_url",
     "thumbnailUrl",
@@ -91,6 +91,20 @@ export function normalizeHubVideo(raw: unknown, index: number): HubVideo | null 
     "thumbnails",
   ]);
 
+  const thumbnailUrl = isRec(thumbnailRaw)
+    ? firstUrl(thumbnailRaw, ["cover", "url", "src", "image"])
+    : firstUrl(raw, [
+        "thumbnail",
+        "thumbnail_url",
+        "thumbnailUrl",
+        "thumb",
+        "poster",
+        "image",
+        "cover",
+        "preview",
+        "thumbnails",
+      ]);
+
   const streamUrl = firstUrl(raw, [
     "hls",
     "hls_url",
@@ -101,7 +115,6 @@ export function normalizeHubVideo(raw: unknown, index: number): HubVideo | null 
     "playbackUrl",
     "video_url",
     "videoUrl",
-    "url",
     "src",
     "file",
     "sources",
@@ -111,7 +124,12 @@ export function normalizeHubVideo(raw: unknown, index: number): HubVideo | null 
   const durationSeconds = parseDurationSeconds(
     pick(raw, ["duration", "durationSeconds", "length", "duration_ms", "runtime"]),
   );
-  const views = num(pick(raw, ["views", "view_count", "viewCount", "plays"]));
+  const viewsRaw = pick(raw, ["views", "view_count", "viewCount", "plays"]);
+  const views = num(viewsRaw);
+  const viewsLabel =
+    typeof viewsRaw === "string" && viewsRaw.trim()
+      ? viewsRaw.trim()
+      : undefined;
 
   const authorRaw = pick(raw, ["author", "channel", "uploader", "user", "creator"]);
   let author: HubVideo["author"];
@@ -168,9 +186,19 @@ export function normalizeHubVideo(raw: unknown, index: number): HubVideo | null 
   if (views !== undefined) {
     video.views = views;
     video.viewsLabel = formatCount(views);
+  } else if (viewsLabel) {
+    video.viewsLabel = viewsLabel;
   }
   if (publishedAt) video.publishedAt = publishedAt;
-  const sourceUrl = firstUrl(raw, ["source_url", "sourceUrl", "page_url", "permalink", "link"]);
+  const sourceUrl = firstUrl(raw, [
+    "url",
+    "source_url",
+    "sourceUrl",
+    "page_url",
+    "permalink",
+    "link",
+  ]);
+
   if (sourceUrl) video.sourceUrl = sourceUrl;
   if (downloadUrl) video.downloadUrl = downloadUrl;
 
@@ -237,15 +265,31 @@ export function normalizeHubFeed(
     return true;
   });
 
-  const hasMore = isRec(payload)
-    ? Boolean(
+  let hasMore = unique.length >= 12;
+
+  if (isRec(payload)) {
+    const data = isRec(payload.data) ? payload.data : undefined;
+
+    const totalPages = num(
+      data ? data.totalPages : undefined,
+    );
+
+    const currentPage = num(
+      data ? data.page : undefined,
+    );
+
+    if (totalPages !== undefined && currentPage !== undefined) {
+      hasMore = currentPage < totalPages;
+    } else {
+      hasMore = Boolean(
         payload.hasMore ??
           payload.has_more ??
           payload.next_page ??
           payload.nextPage ??
-          (unique.length > 0 && unique.length >= 12),
-      )
-    : unique.length >= 12;
+          hasMore,
+      );
+    }
+  }
 
   return {
     success: true,

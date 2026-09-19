@@ -78,6 +78,13 @@ export function parseDurationSeconds(value: unknown): number | undefined {
   }
   const suffixed = trimmed.match(/^(\d+(?:\.\d+)?)\s*(s|sec|secs|seconds)$/i);
   if (suffixed) return Math.round(Number(suffixed[1]));
+
+  const minutes = trimmed.match(/^(\d+(?:\.\d+)?)\s*(m|min|mins|minute|minutes)$/i);
+  if (minutes) return Math.round(Number(minutes[1]) * 60);
+
+  const hours = trimmed.match(/^(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours)$/i);
+  if (hours) return Math.round(Number(hours[1]) * 3600);
+
   return undefined;
 }
 

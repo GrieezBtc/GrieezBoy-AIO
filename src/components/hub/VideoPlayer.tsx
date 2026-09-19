@@ -28,7 +28,7 @@ export function VideoPlayer({ video, onClose, onDownload, onShare }: Props) {
     if (video.playback.url) return;
     const controller = new AbortController();
     setStatus("resolving");
-    fetch(`/api/video-hub/resolve?id=${encodeURIComponent(video.id)}`, {
+    fetch(`/api/video-hub/resolve?url=${encodeURIComponent(video.sourceUrl ?? "")}`, {
       signal: controller.signal,
     })
       .then((response) => response.json())
@@ -51,7 +51,7 @@ export function VideoPlayer({ video, onClose, onDownload, onShare }: Props) {
         setStatus("error");
       });
     return () => controller.abort();
-  }, [video.id, video.playback.url]);
+  }, [video.sourceUrl, video.playback.url]);
 
   /* Attach the stream — native first, hls.js only when needed. */
   useEffect(() => {

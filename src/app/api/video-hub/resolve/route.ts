@@ -7,17 +7,38 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const limit = rateLimit(clientKey(request, "hub-resolve"), 60, 60_000);
+
   if (!limit.allowed) {
-    return Response.json(hubError("RATE_LIMITED"), { status: 429 });
+    return Response.json(hubError("RATE_LIMITED"), {
+      status: 429,
+      headers: {
+        "retry-after": String(limit.retryAfterSeconds),
+      },
+    });
   }
 
   const { searchParams } = new URL(request.url);
-  const id = (searchParams.get("id") ?? "").trim();
-  if (!id) return Response.json(hubError("BAD_QUERY"), { status: 400 });
+  const url = (searchParams.get("url") ?? "").trim();
 
-  const resolved = await resolveHubStream({ id, signal: request.signal });
+  if (!url) {
+    return Response.json(hubError("BAD_QUERY"), {
+      status: 400,
+    });
+  }
+
+  const resolved = await resolveHubStream({
+    url,
+    signal: request.signal,
+  });
+
   return Response.json(resolved, {
-    status: resolved.success ? 200 : 502,
-    headers: { "cache-control": "no-store" },
+    status: resolved.success
+      ? 200
+      : resolved.error.code === "RATE_LIMITED"
+        ? 429
+        : 502,
+    headers: {
+      "cache-control": "no-store",
+    },
   });
 }
