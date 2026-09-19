@@ -52,17 +52,7 @@ export default function AboutPage() {
           </section>
         ))}
       </div>
-
-      <section className="mt-8">
-        <h2 className="t-label">Pipeline</h2>
-        <pre className="mt-2 overflow-x-auto border border-line bg-[color-mix(in_srgb,var(--bg-deep)_70%,transparent)] p-4 text-[0.7rem] leading-relaxed text-dim">
-{`frontend  →  POST /api/download        →  RapidAPI AIO  →  normalizer  →  frontend
-frontend  →  GET  /api/video-hub       →  VIDEO_HUB_ENDPOINT  →  normalizer  →  frontend
-frontend  →  GET  /api/video-hub/resolve →  stream resolver     →  normalizer  →  player`}
-        </pre>
-      </section>
-
-      <section className="mt-8">
+<section className="mt-8">
         <h2 className="t-label">Supported sources</h2>
         <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {PLATFORMS.map((platform) => (
