@@ -3,9 +3,9 @@ import { PLATFORMS } from "@/services/aioDownloader/platforms";
 import { LogoGlyph } from "@/components/Wordmark";
 
 const SOCIALS = [
-  { label: "GitHub", href: "https://github.com", glyph: "GH" },
-  { label: "X", href: "https://x.com", glyph: "X" },
-  { label: "Telegram", href: "https://telegram.org", glyph: "TG" },
+  { label: "WhatsApp", href: "https://wa.me/2349023326317", glyph: "WA" },
+  { label: "X", href: "https://x.com/grieezboy01", glyph: "X" },
+  { label: "Telegram", href: "https://t.me/grieezboy001", glyph: "TG" },
 ];
 
 export function Footer() {
@@ -101,7 +101,7 @@ export function Footer() {
         <div className="mt-8 flex flex-col gap-2 border-t border-line pt-5 text-[0.65rem] tracking-[0.1em] text-faint uppercase sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} GRIEEZBOY AIO · All rights reserved</p>
           <p>
-            Download only content you own or have rights to use.
+            Fast downloads, simple tools. Respect the creators and content behind every link.
           </p>
         </div>
       </div>
