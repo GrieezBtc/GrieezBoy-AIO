@@ -145,9 +145,9 @@ export function Navbar() {
       {/* mobile bottom navigation */}
       <nav
         aria-label="Primary mobile"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-[100] w-full border-t border-line bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
-        <ul className="mx-auto grid max-w-lg grid-cols-4">
+        <ul className="mx-auto grid w-full max-w-lg grid-cols-4">
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (

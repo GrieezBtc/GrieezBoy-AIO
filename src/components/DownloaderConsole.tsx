@@ -251,7 +251,7 @@ export function DownloaderConsole() {
         {stage === "idle" && recent.length ? (
           <section
             aria-label="Recent activity"
-            className="panel-flat p-3.5"
+            className="panel-flat min-w-0 w-full max-w-full overflow-hidden p-3.5"
           >
             <div className="flex items-center justify-between gap-2">
               <h3 className="t-label">Recent activity</h3>
@@ -262,7 +262,7 @@ export function DownloaderConsole() {
                 view log →
               </Link>
             </div>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+            <ul className="mt-3 grid min-w-0 w-full max-w-full gap-2 sm:grid-cols-3">
               {recent.map((entry) => (
                 <li key={entry.id}>
                   <button
@@ -271,7 +271,7 @@ export function DownloaderConsole() {
                       setUrl(entry.url);
                       void execute(entry.url, "auto");
                     }}
-                    className="flex w-full min-h-[56px] items-center gap-2.5 border border-line bg-[color-mix(in_srgb,var(--panel-solid)_55%,transparent)] p-2 text-left transition-colors hover:border-[var(--accent-line)]"
+                    className="flex min-h-[56px] w-full min-w-0 max-w-full items-center gap-2.5 overflow-hidden border border-line bg-[color-mix(in_srgb,var(--panel-solid)_55%,transparent)] p-2 text-left transition-colors hover:border-[var(--accent-line)]"
                   >
                     {entry.thumbnailUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */

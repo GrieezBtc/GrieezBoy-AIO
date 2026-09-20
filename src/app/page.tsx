@@ -34,7 +34,7 @@ const CAPABILITIES = [
 
 export default function HomePage() {
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-3 pt-6 pb-10 sm:px-6 sm:pt-10 lg:px-8">
+    <div className="mx-auto w-full min-w-0 max-w-[1400px] overflow-x-clip px-3 pt-6 pb-24 sm:px-6 sm:pt-10 sm:pb-10 lg:px-8">
       <section className="relative">
         <div className="flex flex-wrap items-center gap-2">
           <span
