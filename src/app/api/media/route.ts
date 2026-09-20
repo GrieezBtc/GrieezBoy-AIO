@@ -10,12 +10,19 @@ const ALLOWED_HOSTS = new Set([
   "med.stellaplus.xyz",
 ]);
 
+function isAllowedHostname(hostname: string): boolean {
+  return (
+    ALLOWED_HOSTS.has(hostname) ||
+    hostname.endsWith(".fbcdn.net")
+  );
+}
+
 function isAllowedMediaUrl(value: string): URL | null {
   try {
     const url = new URL(value);
 
     if (url.protocol !== "https:") return null;
-    if (!ALLOWED_HOSTS.has(url.hostname)) return null;
+    if (!isAllowedHostname(url.hostname)) return null;
 
     return url;
   } catch {
