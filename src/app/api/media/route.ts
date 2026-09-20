@@ -13,7 +13,8 @@ const ALLOWED_HOSTS = new Set([
 function isAllowedHostname(hostname: string): boolean {
   return (
     ALLOWED_HOSTS.has(hostname) ||
-    hostname.endsWith(".fbcdn.net")
+    hostname.endsWith(".fbcdn.net") ||
+    hostname.endsWith(".cdninstagram.com")
   );
 }
 
