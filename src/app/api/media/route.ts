@@ -46,6 +46,12 @@ export async function GET(request: Request) {
   let mediaUrl = isAllowedMediaUrl(urlParam);
 
   if (!mediaUrl) {
+    try {
+      console.log("[media] rejected host:", new URL(urlParam).hostname);
+    } catch {
+      console.log("[media] rejected invalid URL");
+    }
+
     return NextResponse.json(
       { success: false, error: "Media source is not allowed." },
       { status: 400 },
