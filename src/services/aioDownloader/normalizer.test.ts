@@ -37,7 +37,7 @@ describe("platform detection", () => {
   });
 });
 
-describe("normalizeAioResponse — all seven platforms", () => {
+describe("normalizeAioResponse — all eight platforms", () => {
   it.each(PLATFORMS)("normalizes a %s payload", (platform) => {
     const url = SOURCE_URLS[platform];
     const result = normalizeAioResponse(mockAioUpstream(url, platform), { url });

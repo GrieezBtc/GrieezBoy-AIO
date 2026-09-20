@@ -21,7 +21,7 @@ export function Footer() {
               </span>
             </div>
             <p className="mt-3 max-w-xs text-[0.72rem] leading-relaxed text-dim">
-              One engine, seven sources. Paste a link, execute, download. No
+              One engine, eight sources. Paste a link, execute, download. No
               accounts, no tracking, no clutter.
             </p>
           </div>

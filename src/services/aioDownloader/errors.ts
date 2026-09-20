@@ -13,7 +13,7 @@ export const ERROR_CATALOG: Record<DownloadErrorCode, ErrorSpec> = {
   },
   UNSUPPORTED_PLATFORM: {
     message:
-      "That source isn't supported yet. Supported: YouTube, TikTok, Instagram, Facebook, X, Pinterest, Threads.",
+      "That source isn't supported yet. Supported: YouTube, TikTok, Instagram, Facebook, X, Pinterest, Threads, Snapchat.",
     retryable: false,
   },
   PRIVATE_CONTENT: {

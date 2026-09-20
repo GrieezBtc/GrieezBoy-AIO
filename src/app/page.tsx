@@ -11,7 +11,7 @@ const FLOW = [
 
 const CAPABILITIES = [
   {
-    title: "One engine, seven sources",
+    title: "One engine, eight sources",
     body: "A single normalized API path handles every platform. No per-site pages, no duplicated flows.",
     tag: "architecture",
   },
@@ -60,7 +60,7 @@ export default function HomePage() {
         <p className="subdisplay mt-5 max-w-2xl text-dim text-balance">
           One console for{" "}
           <span className="text-ink">
-            YouTube, TikTok, Instagram, Facebook, X, Pinterest and Threads
+            YouTube, TikTok, Instagram, Facebook, X, Pinterest, Threads and Snapchat
           </span>
           . Paste a link, the engine identifies the source and returns every
           format the provider exposes.

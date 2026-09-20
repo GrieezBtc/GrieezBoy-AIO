@@ -13,7 +13,7 @@ type Props = {
 
 const HINTS: Partial<Record<DownloadErrorCode, string>> = {
   INVALID_URL: "Check for typos, or paste the full link including https://",
-  UNSUPPORTED_PLATFORM: "Try a link from one of the seven supported sources.",
+  UNSUPPORTED_PLATFORM: "Try a link from one of the eight supported sources.",
   PRIVATE_CONTENT: "Private accounts and age-gated media cannot be resolved.",
   NO_MEDIA: "Text-only posts contain nothing to extract.",
   RATE_LIMITED: "The engine limits burst traffic to keep the queue fast.",

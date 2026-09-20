@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s · GRIEEZBOY AIO",
   },
   description:
-    "One engine, seven platforms. Paste a link from YouTube, TikTok, Instagram, Facebook, X, Pinterest or Threads and pull every available format.",
+    "One engine, eight platforms. Paste a link from YouTube, TikTok, Instagram, Facebook, X, Pinterest or Threads and pull every available format.",
   applicationName: "GRIEEZBOY AIO",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "GRIEEZBOY AIO — Multi-Source Media Engine",
-    description: "ONE ENGINE → 7 PLATFORMS → PASTE URL → EXECUTE → DOWNLOAD",
+    description: "ONE ENGINE → 8 PLATFORMS → PASTE URL → EXECUTE → DOWNLOAD",
     type: "website",
   },
   robots: { index: true, follow: true },

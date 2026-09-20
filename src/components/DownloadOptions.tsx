@@ -92,10 +92,8 @@ function OptionRow({
           {copied ? "Copied" : "Copy"}
         </button>
         <a
-          href={option.url}
+          href={`/api/media?url=${encodeURIComponent(option.url)}&filename=${encodeURIComponent(filename)}`}
           download={filename}
-          target="_blank"
-          rel="noreferrer noopener"
           onClick={() =>
             push({
               title: "Download started",
