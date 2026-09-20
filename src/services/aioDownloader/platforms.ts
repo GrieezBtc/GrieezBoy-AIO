@@ -67,6 +67,14 @@ export const PLATFORMS: PlatformMeta[] = [
     hint: "posts · media",
     example: "https://www.threads.net/@user/post/CxAbCdEfGhI",
   },
+  {
+    id: "snapchat",
+    label: "Snapchat",
+    short: "SC",
+    accent: "#ffd400",
+    hint: "stories · spotlight · media",
+    example: "https://www.snapchat.com/spotlight/...",
+  },
 ];
 
 export const PLATFORM_MAP: Record<SupportedPlatform, PlatformMeta> =
@@ -104,6 +112,7 @@ const HOST_RULES: Array<[RegExp, SupportedPlatform]> = [
   [/(^|\.)pin\.it$/i, "pinterest"],
   [/(^|\.)threads\.net$/i, "threads"],
   [/(^|\.)threads\.com$/i, "threads"],
+  [/(^|\.)snapchat\.com$/i, "snapchat"],
 ];
 
 const NAME_ALIASES: Record<string, SupportedPlatform> = {
@@ -131,6 +140,8 @@ const NAME_ALIASES: Record<string, SupportedPlatform> = {
   pin: "pinterest",
   threads: "threads",
   thread: "threads",
+  snapchat: "snapchat",
+  snap: "snapchat",
 };
 
 /** Normalizes a free-form platform name (twitter, x, x.com -> twitter). */

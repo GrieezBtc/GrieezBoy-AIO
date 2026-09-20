@@ -5,7 +5,8 @@ export type SupportedPlatform =
   | "facebook"
   | "twitter"
   | "pinterest"
-  | "threads";
+  | "threads"
+  | "snapchat";
 
 export type DownloadOption = {
   id: string;

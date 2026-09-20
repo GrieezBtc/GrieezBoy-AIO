@@ -2,7 +2,7 @@ import type { SupportedPlatform } from "./types";
 
 /**
  * Isolated mock upstream. Shapes intentionally differ per platform so the
- * normalizer is exercised the same way the real RapidAPI payloads will be.
+ * normalizer is exercised against varied upstream-style payloads.
  * Swapping in the real API only requires the client to stop calling this.
  */
 

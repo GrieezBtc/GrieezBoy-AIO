@@ -16,6 +16,7 @@ const VALID_PLATFORMS: SupportedPlatform[] = [
   "twitter",
   "pinterest",
   "threads",
+  "snapchat",
 ];
 
 const STATUS_BY_CODE: Record<string, number> = {

@@ -12,6 +12,7 @@ const SOURCE_URLS: Record<SupportedPlatform, string> = {
   twitter: "https://x.com/user/status/1700000000000000000",
   pinterest: "https://www.pinterest.com/pin/1234567890/",
   threads: "https://www.threads.net/@user/post/CxAbCdEfGhI",
+  snapchat: "https://www.snapchat.com/spotlight/example",
 };
 
 const PLATFORMS = Object.keys(SOURCE_URLS) as SupportedPlatform[];
