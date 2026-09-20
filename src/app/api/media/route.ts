@@ -15,7 +15,8 @@ function isAllowedHostname(hostname: string): boolean {
     ALLOWED_HOSTS.has(hostname) ||
     hostname.endsWith(".fbcdn.net") ||
     hostname.endsWith(".cdninstagram.com") ||
-    hostname.endsWith(".tiktokcdn.com")
+    hostname.endsWith(".tiktokcdn.com") ||
+    hostname.endsWith(".tiktokcdn-us.com")
   );
 }
 
