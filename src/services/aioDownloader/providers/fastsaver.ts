@@ -3,7 +3,7 @@ import { normalizeAioResponse } from "../normalizer";
 import type { AioResponse, SupportedPlatform } from "../types";
 
 const BASE_URL = "https://api.fastsaver.io/v1";
-const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_TIMEOUT_MS = 45_000;
 
 type FastSaverBody = Record<string, unknown>;
 

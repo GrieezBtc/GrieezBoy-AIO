@@ -23,9 +23,18 @@ function isAllowedMediaUrl(value: string): URL | null {
   }
 }
 
+function safeFilename(value: string | null): string {
+  return (
+    (value ?? "grieezboy-media")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(0, 100) || "grieezboy-media"
+  );
+}
+
 export async function GET(request: Request) {
-  const urlParam = new URL(request.url).searchParams.get("url");
-  const filenameParam = new URL(request.url).searchParams.get("filename");
+  const requestUrl = new URL(request.url);
+  const urlParam = requestUrl.searchParams.get("url");
+  const filename = safeFilename(requestUrl.searchParams.get("filename"));
 
   if (!urlParam) {
     return NextResponse.json(
@@ -34,7 +43,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const mediaUrl = isAllowedMediaUrl(urlParam);
+  let mediaUrl = isAllowedMediaUrl(urlParam);
 
   if (!mediaUrl) {
     return NextResponse.json(
@@ -43,45 +52,74 @@ export async function GET(request: Request) {
     );
   }
 
-  const filename =
-    (filenameParam ?? "grieezboy-media")
-      .replace(/[^a-zA-Z0-9._-]/g, "_")
-      .slice(0, 100) || "grieezboy-media";
-
   try {
-    const upstream = await fetch(mediaUrl, {
-      method: "GET",
-      cache: "no-store",
-      redirect: "follow",
-    });
+    for (let redirects = 0; redirects <= 5; redirects += 1) {
+      const upstream = await fetch(mediaUrl, {
+        method: "GET",
+        cache: "no-store",
+        redirect: "manual",
+      });
 
-    if (!upstream.ok || !upstream.body) {
-      return NextResponse.json(
-        { success: false, error: "Unable to retrieve the media file." },
-        { status: upstream.status || 502 },
+      if (
+        upstream.status >= 300 &&
+        upstream.status < 400
+      ) {
+        const location = upstream.headers.get("location");
+
+        if (!location) {
+          return NextResponse.json(
+            { success: false, error: "Media source returned an invalid redirect." },
+            { status: 502 },
+          );
+        }
+
+        const redirectedUrl = new URL(location, mediaUrl);
+        const validated = isAllowedMediaUrl(redirectedUrl.toString());
+
+        if (!validated) {
+          return NextResponse.json(
+            { success: false, error: "Media redirect target is not allowed." },
+            { status: 502 },
+          );
+        }
+
+        mediaUrl = validated;
+        continue;
+      }
+
+      if (!upstream.ok || !upstream.body) {
+        return NextResponse.json(
+          { success: false, error: "Unable to retrieve the media file." },
+          { status: upstream.status || 502 },
+        );
+      }
+
+      const contentType =
+        upstream.headers.get("content-type") ?? "application/octet-stream";
+
+      const headers = new Headers();
+      headers.set("content-type", contentType);
+      headers.set(
+        "content-disposition",
+        `attachment; filename="${filename}"`,
       );
+      headers.set("cache-control", "no-store");
+
+      const contentLength = upstream.headers.get("content-length");
+      if (contentLength) {
+        headers.set("content-length", contentLength);
+      }
+
+      return new Response(upstream.body, {
+        status: 200,
+        headers,
+      });
     }
 
-    const contentType =
-      upstream.headers.get("content-type") ?? "application/octet-stream";
-
-    const headers = new Headers();
-    headers.set("content-type", contentType);
-    headers.set(
-      "content-disposition",
-      `attachment; filename="${filename}"`,
+    return NextResponse.json(
+      { success: false, error: "Too many media redirects." },
+      { status: 502 },
     );
-    headers.set("cache-control", "no-store");
-
-    const contentLength = upstream.headers.get("content-length");
-    if (contentLength) {
-      headers.set("content-length", contentLength);
-    }
-
-    return new Response(upstream.body, {
-      status: 200,
-      headers,
-    });
   } catch {
     return NextResponse.json(
       { success: false, error: "Media download failed." },

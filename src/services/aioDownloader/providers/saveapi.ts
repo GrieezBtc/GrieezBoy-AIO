@@ -3,7 +3,7 @@ import { normalizeAioResponse } from "../normalizer";
 import type { AioResponse, SupportedPlatform } from "../types";
 
 const ENDPOINT = "https://api.saveapi.org/v1/download";
-const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_TIMEOUT_MS = 45_000;
 
 async function readBody(response: Response): Promise<unknown> {
   const text = await response.text();
