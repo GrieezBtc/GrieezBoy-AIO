@@ -9,6 +9,7 @@ const ALLOWED_HOSTS = new Set([
   "api.tiktokv.com",
   "cf-st.sc-cdn.net",
   "med.stellaplus.xyz",
+  "v1.pinimg.com",
   "video.twimg.com",
 ]);
 
