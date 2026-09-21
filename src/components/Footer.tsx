@@ -67,7 +67,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h2 className="t-label">Legal &amp; contact</h2>
+            <h2 className="t-label">Legal &amp; support</h2>
             <ul className="mt-3 space-y-2 text-[0.75rem]">
               <li>
                 <Link href="/privacy" className="text-dim transition-colors hover:text-accent">
@@ -79,7 +79,13 @@ export function Footer() {
                   Terms
                 </Link>
               </li>
+              <li>
+                <Link href="/contact" className="text-dim transition-colors hover:text-accent">
+                  Report an issue
+                </Link>
+              </li>
             </ul>
+
             <ul className="mt-4 flex gap-2">
               {SOCIALS.map((social) => (
                 <li key={social.label}>
