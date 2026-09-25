@@ -8,6 +8,7 @@ const ALLOWED_HOSTS = new Set([
   "api.saveapi.org",
   "api.tiktokv.com",
   "cf-st.sc-cdn.net",
+  "bolt-gcdn.sc-cdn.net",
   "med.stellaplus.xyz",
   "v1.pinimg.com",
   "video.twimg.com",
