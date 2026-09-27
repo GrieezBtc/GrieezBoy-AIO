@@ -25,11 +25,18 @@ async function requestJson(
   const onAbort = () => controller.abort();
   signal?.addEventListener("abort", onAbort);
 
+  const apiKey = process.env.X_API_KEY?.trim();
+
+  if (!apiKey) {
+    throw new Error("VIDEO_HUB_API_KEY_MISSING");
+  }
+
   try {
     const response = await fetch(input, {
       method: "GET",
       headers: {
         accept: "application/json",
+        "X-API-Key": apiKey,
       },
       cache: "no-store",
       signal: controller.signal,

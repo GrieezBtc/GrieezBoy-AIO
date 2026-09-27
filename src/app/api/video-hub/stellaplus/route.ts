@@ -32,11 +32,28 @@ export async function GET() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+  const apiKey = process.env.X_API_KEY?.trim();
+
+  if (!apiKey) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "CONFIGURATION_ERROR",
+          message: "Video Hub authentication is not configured.",
+          retryable: false,
+        },
+      },
+      { status: 503 },
+    );
+  }
+
   try {
     const response = await fetch(STELLAPLUS_ENDPOINT, {
       method: "GET",
       headers: {
         accept: "application/json",
+        "X-API-Key": apiKey,
       },
       cache: "no-store",
       signal: controller.signal,
