@@ -10,27 +10,6 @@ const SEARCH_DEBOUNCE_MS = 280;
 
 type HubMode = "feed" | "search";
 
-type StellaPlusPayload =
-  | {
-      success: true;
-      video: {
-        title: string;
-        thumbnail: string;
-        playback: {
-          url: string;
-          type: "mp4";
-        };
-        downloadUrl: string;
-        sourceUrl: string;
-      };
-    }
-  | {
-      success: false;
-      error?: {
-        message?: string;
-      };
-    };
-
 export function VideoHubView() {
   const { push } = useToast();
 
@@ -48,25 +27,17 @@ export function VideoHubView() {
   const [offline, setOffline] = useState(false);
   const [active, setActive] = useState<HubVideo | null>(null);
 
-  const feedAbortRef = useRef<AbortController | null>(null);
-  const searchAbortRef = useRef<AbortController | null>(null);
+  const requestAbortRef = useRef<AbortController | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
+  const requestedRef = useRef("");
 
-  const feedLoadingRef = useRef(false);
-  const feedSeenRef = useRef(new Set<string>());
-
-  const searchLoadingRef = useRef(false);
-  const searchRequestedRef = useRef<string>("");
-
-  /*
-   * Search mode begins immediately when the user focuses/types.
-   * This wipes the StellaPlus feed before the debounced API request.
-   */
   const enterSearchMode = useCallback(() => {
     if (mode === "search") return;
 
-    feedAbortRef.current?.abort();
-    feedLoadingRef.current = false;
+    requestAbortRef.current?.abort();
+    loadingRef.current = false;
+    requestedRef.current = "";
 
     setMode("search");
     setItems([]);
@@ -77,13 +48,10 @@ export function VideoHubView() {
     setLoadingMore(false);
   }, [mode]);
 
-  /*
-   * Clearing the search returns the hub to its default StellaPlus feed.
-   */
   const returnToFeed = useCallback(() => {
-    searchAbortRef.current?.abort();
-    searchLoadingRef.current = false;
-    searchRequestedRef.current = "";
+    requestAbortRef.current?.abort();
+    loadingRef.current = false;
+    requestedRef.current = "";
 
     setMode("feed");
     setInput("");
@@ -94,8 +62,6 @@ export function VideoHubView() {
     setError(null);
     setLoading(true);
     setLoadingMore(false);
-
-    feedSeenRef.current.clear();
   }, []);
 
   useEffect(() => {
@@ -125,116 +91,25 @@ export function VideoHubView() {
     };
   }, []);
 
-  /*
-   * StellaPlus feed.
-   *
-   * Each request returns one generated video, so there is no page parameter.
-   * We keep requesting as the user approaches the bottom and deduplicate by
-   * source/playback URL.
-   */
-  const loadStellaPlus = useCallback(async (initial = false) => {
-    if (mode !== "feed" || feedLoadingRef.current) return;
+  const loadPage = useCallback(
+    async (targetQuery: string, targetPage: number, initial = false) => {
+      const cleanQuery = targetQuery.trim();
 
-    feedLoadingRef.current = true;
+      if (mode === "search" && !cleanQuery) return;
+      if (loadingRef.current) return;
 
-    const controller = new AbortController();
-    feedAbortRef.current = controller;
+      const key = `${mode}:${cleanQuery}:${targetPage}`;
 
-    if (initial) {
-      setLoading(true);
-      setError(null);
-    } else {
-      setLoadingMore(true);
-    }
+      if (requestedRef.current === key) return;
+      requestedRef.current = key;
 
-    try {
-      const response = await fetch("/api/video-hub/stellaplus", {
-        signal: controller.signal,
-        cache: "no-store",
-      });
-
-      const payload = (await response.json()) as StellaPlusPayload;
-
-      if (!response.ok || !payload.success) {
-        throw new Error(
-          !payload.success
-            ? payload.error?.message ?? "Unable to load the video feed."
-            : "Unable to load the video feed.",
-        );
-      }
-
-      const video: HubVideo = {
-        id: `stellaplus-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        title: payload.video.title,
-        thumbnailUrl: payload.video.thumbnail,
-        sourceUrl: payload.video.sourceUrl,
-        tags: ["stellaplus"],
-        playback: {
-          url: payload.video.playback.url,
-          type: "mp4",
-          needsResolve: false,
-        },
-        downloadUrl: payload.video.downloadUrl,
-      };
-
-      const identity = video.downloadUrl ?? video.sourceUrl ?? video.id;
-
-      if (!feedSeenRef.current.has(identity)) {
-        feedSeenRef.current.add(identity);
-        setItems((current) => [...current, video]);
-      }
-    } catch (caught) {
-      if ((caught as { name?: string })?.name === "AbortError") return;
-
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Connection to the video feed failed.",
-      );
-    } finally {
-      feedLoadingRef.current = false;
-
-      if (!controller.signal.aborted) {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    }
-  }, [mode]);
-
-  /*
-   * Start the StellaPlus feed when the Video Hub opens.
-   */
-  useEffect(() => {
-    if (mode !== "feed") return;
-
-    if (items.length === 0) {
-      void loadStellaPlus(true);
-    }
-  }, [mode, items.length, loadStellaPlus]);
-
-  /*
-   * Search API.
-   *
-   * Search is intentionally resolved lazily. The search endpoint only supplies
-   * metadata/source URLs; Watch invokes the resolver through VideoPlayer.
-   */
-  const loadSearch = useCallback(
-    async (targetQuery: string, targetPage: number) => {
-      if (mode !== "search" || !targetQuery.trim()) return;
-      if (searchLoadingRef.current) return;
-
-      const key = `${targetQuery}::${targetPage}`;
-
-      if (searchRequestedRef.current === key) return;
-      searchRequestedRef.current = key;
-
-      searchAbortRef.current?.abort();
+      requestAbortRef.current?.abort();
 
       const controller = new AbortController();
-      searchAbortRef.current = controller;
-      searchLoadingRef.current = true;
+      requestAbortRef.current = controller;
+      loadingRef.current = true;
 
-      if (targetPage === 0) {
+      if (initial || targetPage === 0) {
         setLoading(true);
         setError(null);
       } else {
@@ -242,8 +117,16 @@ export function VideoHubView() {
       }
 
       try {
+        const params = new URLSearchParams({
+          page: String(targetPage),
+        });
+
+        if (cleanQuery) {
+          params.set("q", cleanQuery);
+        }
+
         const response = await fetch(
-          `/api/video-hub?q=${encodeURIComponent(targetQuery)}&page=${targetPage}`,
+          `/api/video-hub?${params.toString()}`,
           {
             signal: controller.signal,
             cache: "no-store",
@@ -257,13 +140,17 @@ export function VideoHubView() {
         }
 
         setItems((current) => {
-          if (targetPage === 0) return payload.items;
+          if (targetPage === 0) {
+            return payload.items;
+          }
 
           const existing = new Set(current.map((item) => item.id));
 
           return [
             ...current,
-            ...payload.items.filter((item) => !existing.has(item.id)),
+            ...payload.items.filter(
+              (item) => !existing.has(item.id),
+            ),
           ];
         });
 
@@ -271,79 +158,88 @@ export function VideoHubView() {
         setHasMore(payload.hasMore);
         setError(null);
       } catch (caught) {
-        if ((caught as { name?: string })?.name === "AbortError") return;
+        if ((caught as { name?: string })?.name === "AbortError") {
+          return;
+        }
 
         setError(
           caught instanceof Error
             ? caught.message
-            : "Connection to the search service failed.",
+            : "Connection to the video service failed.",
         );
 
         if (targetPage === 0) {
           setItems([]);
         }
       } finally {
-        searchLoadingRef.current = false;
+        loadingRef.current = false;
 
         if (!controller.signal.aborted) {
           setLoading(false);
           setLoadingMore(false);
         }
 
-        searchRequestedRef.current = "";
+        requestedRef.current = "";
       }
     },
     [mode],
   );
 
   /*
-   * A debounced query starts a fresh search and replaces whatever was there.
+   * Default YouTube popular feed.
+   */
+  useEffect(() => {
+    if (mode !== "feed") return;
+
+    if (items.length === 0 && !loadingRef.current) {
+      void loadPage("", 0, true);
+    }
+  }, [mode, items.length, loadPage]);
+
+  /*
+   * Debounced YouTube search.
    */
   useEffect(() => {
     if (mode !== "search" || !query) return;
 
-    searchAbortRef.current?.abort();
-    searchLoadingRef.current = false;
-    searchRequestedRef.current = "";
+    requestAbortRef.current?.abort();
+    loadingRef.current = false;
+    requestedRef.current = "";
 
     setItems([]);
     setPage(0);
     setHasMore(true);
     setError(null);
 
-    void loadSearch(query, 0);
-  }, [mode, query, loadSearch]);
+    void loadPage(query, 0, true);
+  }, [mode, query, loadPage]);
 
   useEffect(() => {
     return () => {
-      feedAbortRef.current?.abort();
-      searchAbortRef.current?.abort();
+      requestAbortRef.current?.abort();
     };
   }, []);
 
   /*
-   * Infinite loading:
-   *
-   * Feed mode:
-   *   request another StellaPlus video.
-   *
-   * Search mode:
-   *   request the next search page.
+   * Infinite loading.
    */
   useEffect(() => {
     const node = sentinelRef.current;
 
-    if (!node || loading || loadingMore || !hasMore) return;
+    if (!node || loading || loadingMore || !hasMore) {
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries[0]?.isIntersecting) return;
 
-        if (mode === "feed") {
-          void loadStellaPlus(false);
-        } else if (query) {
-          void loadSearch(query, page + 1);
-        }
+        const nextPage = page + 1;
+
+        void loadPage(
+          mode === "search" ? query : "",
+          nextPage,
+        );
       },
       { rootMargin: "700px 0px" },
     );
@@ -358,20 +254,16 @@ export function VideoHubView() {
     hasMore,
     loading,
     loadingMore,
-    loadStellaPlus,
-    loadSearch,
+    loadPage,
   ]);
 
   const share = useCallback(
     async (video: HubVideo) => {
-      const url =
-        video.sourceUrl ?? video.playback.url ?? window.location.href;
+      const url = video.sourceUrl ?? window.location.href;
 
-      const nav: Navigator = navigator;
-
-      if (typeof nav.share === "function") {
+      if (typeof navigator.share === "function") {
         try {
-          await nav.share({
+          await navigator.share({
             title: video.title,
             url,
           });
@@ -382,7 +274,8 @@ export function VideoHubView() {
       }
 
       try {
-        await nav.clipboard.writeText(url);
+        await navigator.clipboard.writeText(url);
+
         push({
           title: "Link copied",
           body: video.title,
@@ -399,46 +292,97 @@ export function VideoHubView() {
     [push],
   );
 
+  /*
+   * Download through the existing AIO downloader.
+   *
+   * YouTube's Data API does not provide downloadable media URLs.
+   * The actual download resolver remains the existing AIO pipeline.
+   */
   const download = useCallback(
-    (video: HubVideo) => {
-      const url =
-        video.downloadUrl ??
-        (video.playback.type === "mp4"
-          ? video.playback.url
-          : undefined);
-
-      if (!url) {
+    async (video: HubVideo) => {
+      if (!video.sourceUrl) {
         push({
-          title: "No direct file",
-          body: "This entry is stream-only — open the player to watch it.",
-          tone: "info",
+          title: "No source URL",
+          body: "This video cannot be downloaded.",
+          tone: "error",
         });
         return;
       }
 
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = "";
-      anchor.target = "_blank";
-      anchor.rel = "noreferrer noopener";
-      anchor.click();
+      try {
+        const response = await fetch("/api/download", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            url: video.sourceUrl,
+          }),
+        });
 
-      push({
-        title: "Download started",
-        body: video.title,
-        tone: "ok",
-      });
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.success) {
+          throw new Error(
+            payload?.error?.message ??
+              "Unable to resolve the download.",
+          );
+        }
+
+        const options = Array.isArray(payload.options)
+          ? payload.options
+          : [];
+
+        const preferred =
+          options.find(
+            (option: { url?: string; quality?: string }) =>
+              option.url &&
+              typeof option.url === "string" &&
+              option.quality?.toLowerCase().includes("high"),
+          ) ??
+          options.find(
+            (option: { url?: string }) =>
+              option.url &&
+              typeof option.url === "string",
+          );
+
+        if (!preferred?.url) {
+          throw new Error("No downloadable format was returned.");
+        }
+
+        const anchor = document.createElement("a");
+        anchor.href = preferred.url;
+        anchor.target = "_blank";
+        anchor.rel = "noreferrer noopener";
+        anchor.download = "";
+        anchor.click();
+
+        push({
+          title: "Download started",
+          body: video.title,
+          tone: "ok",
+        });
+      } catch (caught) {
+        push({
+          title: "Download failed",
+          body:
+            caught instanceof Error
+              ? caught.message
+              : "Unable to resolve this video.",
+          tone: "error",
+        });
+      }
     },
     [push],
   );
 
   const retry = useCallback(() => {
-    if (mode === "feed") {
-      void loadStellaPlus(items.length === 0);
-    } else if (query) {
-      void loadSearch(query, page);
-    }
-  }, [mode, items.length, query, page, loadStellaPlus, loadSearch]);
+    void loadPage(
+      mode === "search" ? query : "",
+      page,
+      page === 0,
+    );
+  }, [mode, query, page, loadPage]);
 
   return (
     <div className="space-y-5">
@@ -447,7 +391,10 @@ export function VideoHubView() {
         onSubmit={(event) => event.preventDefault()}
         className="panel flex flex-col gap-2 p-3 sm:flex-row sm:items-center"
       >
-        <label htmlFor="hub-search" className="t-label shrink-0 sm:pl-1">
+        <label
+          htmlFor="hub-search"
+          className="t-label shrink-0 sm:pl-1"
+        >
           <span aria-hidden className="mr-2 text-accent">
             /
           </span>
@@ -461,10 +408,13 @@ export function VideoHubView() {
             value={input}
             onFocus={enterSearchMode}
             onChange={(event) => {
-              if (mode !== "search") enterSearchMode();
+              if (mode !== "search") {
+                enterSearchMode();
+              }
+
               setInput(event.target.value);
             }}
-            placeholder="Search videos…"
+            placeholder="Search YouTube videos…"
             autoComplete="off"
             className="min-h-[44px] w-full min-w-0 bg-transparent text-[0.85rem] outline-none placeholder:text-faint"
           />
@@ -487,8 +437,8 @@ export function VideoHubView() {
         >
           {loading
             ? mode === "feed"
-              ? "loading feed…"
-              : "searching…"
+              ? "loading popular videos…"
+              : "searching YouTube…"
             : mode === "feed"
               ? `${items.length} videos`
               : `${items.length} results`}
@@ -522,9 +472,15 @@ export function VideoHubView() {
               className="text-[0.78rem] font-bold tracking-[0.18em] uppercase"
               style={{ color: "var(--danger)" }}
             >
-              [!] {mode === "feed" ? "Feed unavailable" : "Search unavailable"}
+              [!]{" "}
+              {mode === "feed"
+                ? "Feed unavailable"
+                : "Search unavailable"}
             </p>
-            <p className="mt-1.5 text-[0.76rem] text-dim">{error}</p>
+
+            <p className="mt-1.5 text-[0.76rem] text-dim">
+              {error}
+            </p>
           </div>
 
           <button
@@ -537,9 +493,14 @@ export function VideoHubView() {
         </div>
       ) : null}
 
-      {mode === "search" && query && !loading && !error && items.length === 0 ? (
+      {mode === "search" &&
+      query &&
+      !loading &&
+      !error &&
+      items.length === 0 ? (
         <div className="panel-flat grid place-items-center gap-2 px-4 py-12 text-center">
           <p className="t-label">no results</p>
+
           <p className="max-w-md text-[0.8rem] text-dim">
             Nothing matched{" "}
             <span className="text-ink">“{query}”</span>.
@@ -562,18 +523,18 @@ export function VideoHubView() {
                 video={video}
                 onWatch={setActive}
                 onShare={(target) => void share(target)}
-                onDownload={download}
+                onDownload={(target) => void download(target)}
               />
             ))}
 
         {loadingMore
-          ? Array.from({ length: mode === "feed" ? 5 : 4 }).map(
-              (_, index) => (
-                <VideoCardSkeleton
-                  key={`more-skeleton-${index}`}
-                />
-              ),
-            )
+          ? Array.from({
+              length: mode === "feed" ? 5 : 4,
+            }).map((_, index) => (
+              <VideoCardSkeleton
+                key={`more-skeleton-${index}`}
+              />
+            ))
           : null}
       </div>
 
@@ -583,7 +544,9 @@ export function VideoHubView() {
         className="h-4"
       />
 
-      {mode === "search" && !hasMore && items.length > 0 ? (
+      {mode === "search" &&
+      !hasMore &&
+      items.length > 0 ? (
         <p className="t-label py-4 text-center">
           — end of search results —
         </p>
@@ -593,13 +556,7 @@ export function VideoHubView() {
         <VideoPlayer
           video={active}
           onClose={() => setActive(null)}
-          onDownload={() =>
-            push({
-              title: "Download started",
-              body: active.title,
-              tone: "ok",
-            })
-          }
+          onDownload={() => void download(active)}
           onShare={(video) => void share(video)}
         />
       ) : null}

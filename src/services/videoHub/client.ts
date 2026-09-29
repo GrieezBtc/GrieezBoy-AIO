@@ -1,42 +1,49 @@
-import { isSafeMediaUrl } from "@/services/aioDownloader/platforms";
-import { mockHubResolve, mockHubUpstream } from "./mock";
 import { hubError, normalizeHubFeed } from "./normalizer";
-import type { HubResolved, HubResponse } from "./types";
+import type { HubResponse } from "./types";
 
+const YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3";
 const HUB_TIMEOUT_MS = 15_000;
+const MAX_RESULTS = 24;
 
-const SEARCH_ENDPOINT =
-  "https://apis.davidcyril.name.ng/xxx/xnxx";
-
-const DOWNLOAD_ENDPOINT =
-  "https://apis.davidcyril.name.ng/download/xnxx";
-
-function readLiveMode(): boolean {
-  return process.env.VIDEO_HUB_LIVE !== "false";
+function getApiKey(): string | null {
+  const key = process.env.YOUTUBE_API_KEY?.trim();
+  return key || null;
 }
 
 async function requestJson(
-  input: string,
+  path: string,
+  params: Record<string, string>,
   signal?: AbortSignal,
 ): Promise<{ ok: boolean; status: number; body: unknown }> {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    return {
+      ok: false,
+      status: 503,
+      body: null,
+    };
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), HUB_TIMEOUT_MS);
 
   const onAbort = () => controller.abort();
   signal?.addEventListener("abort", onAbort);
 
-  const apiKey = process.env.X_API_KEY?.trim();
-
-  if (!apiKey) {
-    throw new Error("VIDEO_HUB_API_KEY_MISSING");
-  }
-
   try {
-    const response = await fetch(input, {
+    const url = new URL(`${YOUTUBE_ENDPOINT}/${path}`);
+
+    for (const [key, value] of Object.entries(params)) {
+      url.searchParams.set(key, value);
+    }
+
+    url.searchParams.set("key", apiKey);
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         accept: "application/json",
-        "X-API-Key": apiKey,
       },
       cache: "no-store",
       signal: controller.signal,
@@ -63,185 +70,151 @@ async function requestJson(
   }
 }
 
-function buildSearchUrl(query: string, page: number): string {
-  const url = new URL(SEARCH_ENDPOINT);
-
-  url.searchParams.set("q", query);
-
-  if (page > 0) {
-    url.searchParams.set("page", String(page + 1));
-  }
-
-  return url.toString();
+function normalizeYouTubeItems(body: unknown): HubResponse {
+  return normalizeHubFeed(body, {
+    query: "",
+    page: 0,
+  });
 }
 
 export function isHubLive(): boolean {
-  return readLiveMode();
+  return Boolean(getApiKey());
 }
+
+export type HubFetchResult = {
+  feed: HubResponse;
+  nextPageToken?: string;
+};
 
 export async function fetchHubFeed(options: {
   query: string;
   page: number;
+  pageToken?: string;
   signal?: AbortSignal;
-}): Promise<HubResponse> {
+}): Promise<HubFetchResult> {
   const query = options.query.trim().slice(0, 120);
-  const page = Number.isFinite(options.page)
-    ? Math.max(0, Math.floor(options.page))
-    : 0;
-
-  if (!query) {
-    return normalizeHubFeed(
-      {
-        creator: "David Cyril",
-        success: true,
-        data: {
-          page: 1,
-          totalResults: 0,
-          totalPages: 0,
-          results: [],
-        },
-      },
-      { query, page },
-    );
-  }
-
-  if (!readLiveMode()) {
-    await new Promise((resolve) => setTimeout(resolve, 420));
-
-    return normalizeHubFeed(mockHubUpstream(query, page), {
-      query,
-      page,
-    });
-  }
 
   try {
-    const { ok, status, body } = await requestJson(
-      buildSearchUrl(query, page),
+    const params: Record<string, string> = {
+      part: "snippet,contentDetails,statistics",
+      maxResults: String(MAX_RESULTS),
+    };
+
+    if (query) {
+      params.type = "video";
+      params.q = query;
+      params.order = "relevance";
+
+      if (options.pageToken) {
+        params.pageToken = options.pageToken;
+      }
+
+      const result = await requestJson(
+        "search",
+        params,
+        options.signal,
+      );
+
+      if (!result.ok) {
+        if (result.status === 429) return { feed: hubError("RATE_LIMITED") };
+        if (result.status === 404) return { feed: hubError("NOT_FOUND") };
+        if (result.status === 408 || result.status === 504) {
+          return { feed: hubError("TIMEOUT") };
+        }
+        if (result.status === 503) {
+          return { feed: hubError("UPSTREAM_ERROR") };
+        }
+
+        return { feed: hubError("UPSTREAM_ERROR") };
+      }
+
+      const body = result.body as Record<string, unknown>;
+
+      return {
+        feed: normalizeYouTubeItems({
+          ...body,
+          _query: query,
+          _page: options.page,
+        }),
+        nextPageToken:
+          typeof body.nextPageToken === "string"
+            ? body.nextPageToken
+            : undefined,
+      };
+    }
+
+    params.chart = "mostPopular";
+    params.regionCode = "NG";
+
+    const result = await requestJson(
+      "videos",
+      params,
       options.signal,
     );
 
-    if (!ok) {
-      if (status === 429) return hubError("RATE_LIMITED");
-      if (status === 404) return hubError("NOT_FOUND");
-      if (status === 408 || status === 504) return hubError("TIMEOUT");
+    if (!result.ok) {
+      if (result.status === 429) return { feed: hubError("RATE_LIMITED") };
+      if (result.status === 404) return { feed: hubError("NOT_FOUND") };
+      if (result.status === 408 || result.status === 504) {
+        return { feed: hubError("TIMEOUT") };
+      }
+      if (result.status === 503) {
+        return { feed: hubError("UPSTREAM_ERROR") };
+      }
 
-      return hubError("UPSTREAM_ERROR");
+      return { feed: hubError("UPSTREAM_ERROR") };
     }
 
-    return normalizeHubFeed(body, {
-      query,
-      page,
-    });
+    const body = result.body as Record<string, unknown>;
+
+    return {
+      feed: normalizeYouTubeItems({
+        ...body,
+        _query: "",
+        _page: options.page,
+      }),
+      nextPageToken:
+        typeof body.nextPageToken === "string"
+          ? body.nextPageToken
+          : undefined,
+    };
   } catch (error) {
     const name = (error as { name?: string } | null)?.name;
 
     if (name === "AbortError" || name === "TimeoutError") {
-      return hubError("TIMEOUT");
+      return { feed: hubError("TIMEOUT") };
     }
 
-    return hubError("NETWORK_ERROR");
+    return { feed: hubError("NETWORK_ERROR") };
   }
 }
 
-/**
- * Resolves an XNXX search-result URL through the download API.
- *
- * The search API gives us the source URL. That exact URL is sent to:
- * /download/xnxx?url=<source URL>
- */
 export async function resolveHubStream(options: {
   url: string;
   signal?: AbortSignal;
-}): Promise<HubResolved> {
-  const sourceUrl = options.url.trim().slice(0, 2000);
+}) {
+  const sourceUrl = options.url.trim();
 
   try {
     const parsed = new URL(sourceUrl);
 
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    if (
+      parsed.protocol !== "http:" &&
+      parsed.protocol !== "https:"
+    ) {
       return hubError("BAD_QUERY");
     }
   } catch {
     return hubError("BAD_QUERY");
   }
 
-  if (!readLiveMode()) {
-    await new Promise((resolve) => setTimeout(resolve, 220));
-
-    return toResolved(mockHubResolve(sourceUrl), sourceUrl);
-  }
-
-  try {
-    const url = new URL(DOWNLOAD_ENDPOINT);
-    url.searchParams.set("url", sourceUrl);
-
-    const { ok, status, body } = await requestJson(
-      url.toString(),
-      options.signal,
-    );
-
-    if (!ok) {
-      if (status === 429) return hubError("RATE_LIMITED");
-      if (status === 404) return hubError("NOT_FOUND");
-      if (status === 408 || status === 504) return hubError("TIMEOUT");
-
-      return hubError("UPSTREAM_ERROR");
-    }
-
-    return toResolved(body, sourceUrl);
-  } catch (error) {
-    const name = (error as { name?: string } | null)?.name;
-
-    if (name === "AbortError" || name === "TimeoutError") {
-      return hubError("TIMEOUT");
-    }
-
-    return hubError("NETWORK_ERROR");
-  }
-}
-
-function toResolved(raw: unknown, id: string): HubResolved {
-  if (typeof raw !== "object" || raw === null) {
-    return hubError("MALFORMED_RESPONSE");
-  }
-
-  const root = raw as Record<string, unknown>;
-  const result =
-    typeof root.result === "object" && root.result !== null
-      ? (root.result as Record<string, unknown>)
-      : undefined;
-
-  if (root.status === false || !result) {
-    return hubError("MALFORMED_RESPONSE");
-  }
-
-  const download =
-    typeof result.download === "object" && result.download !== null
-      ? (result.download as Record<string, unknown>)
-      : undefined;
-
-  const candidates = [
-    download?.high_quality,
-    download?.low_quality,
-  ];
-
-  const playbackUrl = candidates.find((value) =>
-    isSafeMediaUrl(value),
-  );
-
-  if (!playbackUrl || typeof playbackUrl !== "string") {
-    return hubError("NOT_FOUND");
-  }
-
-  const url = playbackUrl.trim();
-
   return {
-    success: true,
-    id,
+    success: true as const,
+    id: sourceUrl,
     playback: {
-      url,
-      type: "mp4",
+      url: sourceUrl,
+      type: "unknown" as const,
     },
-    downloadUrl: url,
+    downloadUrl: sourceUrl,
   };
 }
