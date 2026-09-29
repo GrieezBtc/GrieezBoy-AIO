@@ -352,11 +352,16 @@ export function VideoHubView() {
           throw new Error("No downloadable format was returned.");
         }
 
+        const filename =
+          `${video.title.replace(/[^\\w\\s.-]/g, "").trim().slice(0, 80) || "youtube-video"}.mp4`;
+
+        const downloadUrl =
+          `/api/media?url=${encodeURIComponent(preferred.url)}` +
+          `&filename=${encodeURIComponent(filename)}`;
+
         const anchor = document.createElement("a");
-        anchor.href = preferred.url;
-        anchor.target = "_blank";
-        anchor.rel = "noreferrer noopener";
-        anchor.download = "";
+        anchor.href = downloadUrl;
+        anchor.download = filename;
         anchor.click();
 
         push({
