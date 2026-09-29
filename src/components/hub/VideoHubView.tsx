@@ -168,6 +168,8 @@ export function VideoHubView() {
             : "Connection to the video service failed.",
         );
 
+        setHasMore(false);
+
         if (targetPage === 0) {
           setItems([]);
         }

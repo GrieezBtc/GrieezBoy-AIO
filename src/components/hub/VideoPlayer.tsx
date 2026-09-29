@@ -75,7 +75,7 @@ export function VideoPlayer({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-[color-mix(in_srgb,var(--bg-deep)_86%,transparent)] p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-[120] flex items-end justify-center bg-[color-mix(in_srgb,var(--bg-deep)_86%,transparent)] p-0 backdrop-blur-sm sm:items-center sm:p-6"
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose();

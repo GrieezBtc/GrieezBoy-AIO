@@ -96,7 +96,7 @@ export async function fetchHubFeed(options: {
 
   try {
     const params: Record<string, string> = {
-      part: "snippet,contentDetails,statistics",
+      part: query ? "snippet" : "snippet,contentDetails,statistics",
       maxResults: String(MAX_RESULTS),
     };
 
