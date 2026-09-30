@@ -94,9 +94,21 @@ export async function GET(request: Request) {
         }
 
         const redirectedUrl = new URL(location, mediaUrl);
+
+        console.log("[media] upstream redirect:", {
+          from: mediaUrl.hostname,
+          to: redirectedUrl.hostname,
+          status: upstream.status,
+        });
+
         const validated = isAllowedMediaUrl(redirectedUrl.toString());
 
         if (!validated) {
+          console.error("[media] redirect target rejected:", {
+            from: mediaUrl.hostname,
+            to: redirectedUrl.hostname,
+          });
+
           return NextResponse.json(
             { success: false, error: "Media redirect target is not allowed." },
             { status: 502 },
@@ -140,7 +152,12 @@ export async function GET(request: Request) {
       { success: false, error: "Too many media redirects." },
       { status: 502 },
     );
-  } catch {
+  } catch (error) {
+    console.error("[media] download exception:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
     return NextResponse.json(
       { success: false, error: "Media download failed." },
       { status: 502 },
