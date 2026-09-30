@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 const ALLOWED_HOSTS = new Set([
   "api.fastsaver.io",
   "api.saveapi.org",
+  "dl-7.ytdload.com",
   "api.tiktokv.com",
   "cf-st.sc-cdn.net",
   "bolt-gcdn.sc-cdn.net",
