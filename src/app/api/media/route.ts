@@ -13,6 +13,7 @@ const ALLOWED_HOSTS = new Set([
   "med.stellaplus.xyz",
   "v1.pinimg.com",
   "video.twimg.com",
+  "p16-common-sign.tiktokcdn-eu.com",
 ]);
 
 function isAllowedHostname(hostname: string): boolean {
