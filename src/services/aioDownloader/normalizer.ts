@@ -714,22 +714,10 @@ export function normalizeAioResponse(
     const kind: "video" | "audio" | "image" =
       video ? "video" : image ? "image" : audio ? "audio" : "video";
 
-    const nodeThumbnail =
-      firstUrl(
-        group.map((candidate) => candidate.node),
-        [
-          "thumbnail",
-          "thumbnail_url",
-          "thumbnailUrl",
-          "thumb",
-          "poster",
-          "preview",
-          "preview_url",
-          "previewUrl",
-        ],
-      ) ?? undefined;
-
-    const previewUrl = image?.url ?? nodeThumbnail ?? video?.url;
+    const previewUrl =
+      image?.url ??
+      video?.url ??
+      audio?.url;
 
     const label =
       video?.qualityLabel ??
@@ -742,7 +730,6 @@ export function normalizeAioResponse(
         id: `media-${index + 1}`,
         kind,
         previewUrl,
-        thumbnailUrl: nodeThumbnail,
         label,
         options: groupOptions,
       },
