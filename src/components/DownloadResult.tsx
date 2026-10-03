@@ -1,6 +1,6 @@
 "use client";
 
-import { DownloadOptions } from "@/components/DownloadOptions";
+import { MediaGallery } from "@/components/MediaGallery";
 import { MediaPreview } from "@/components/MediaPreview";
 import { StagePipeline } from "@/components/LoadingState";
 import type { NormalizedDownloadResult } from "@/services/aioDownloader/types";
@@ -38,7 +38,7 @@ export function DownloadResult({
 
       <div className="space-y-6 p-4 sm:p-5">
         <MediaPreview result={result} />
-        <DownloadOptions options={result.options} title={result.media.title} />
+        <MediaGallery items={result.items} title={result.media.title} />
 
         <details className="border border-line bg-[color-mix(in_srgb,var(--panel-solid)_50%,transparent)]">
           <summary className="t-label cursor-pointer list-none px-3 py-2.5 select-none">
@@ -54,7 +54,7 @@ export function DownloadResult({
                 "duration (s)",
                 result.media.durationSeconds ? String(result.media.durationSeconds) : "—",
               ],
-              ["options returned", String(result.options.length)],
+              ["media items", String(result.items.length)],
             ].map(([label, value]) => (
               <div
                 key={label}

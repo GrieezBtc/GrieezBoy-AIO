@@ -25,6 +25,15 @@ export type DownloadOption = {
   label: string;
 };
 
+export type NormalizedMediaItem = {
+  id: string;
+  kind: "video" | "audio" | "image";
+  previewUrl?: string;
+  thumbnailUrl?: string;
+  label?: string;
+  options: DownloadOption[];
+};
+
 export type NormalizedMedia = {
   id?: string;
   kind: "video" | "audio" | "image" | "carousel" | "unknown";
@@ -50,6 +59,7 @@ export type NormalizedDownloadResult = {
     platformLabel: string;
   };
   media: NormalizedMedia;
+  items: NormalizedMediaItem[];
   options: DownloadOption[];
 };
 

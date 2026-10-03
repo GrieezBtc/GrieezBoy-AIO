@@ -679,12 +679,79 @@ export function normalizeAioResponse(
   const candidates: Candidate[] = [];
   harvest(root, 0, "$root", candidates);
 
+  const itemGroups = new Map<Rec, Candidate[]>();
+
+  for (const candidate of candidates) {
+    const existing = itemGroups.get(candidate.node);
+    if (existing) {
+      existing.push(candidate);
+    } else {
+      itemGroups.set(candidate.node, [candidate]);
+    }
+  }
+
+  const seenUrls = new Set<string>();
+
+  const items = Array.from(itemGroups.values()).flatMap((group, index) => {
+    const groupOptions = dedupe(
+      sortOptions(
+        group
+          .map(buildOption)
+          .filter((option): option is DownloadOption => option !== null),
+      ),
+    ).filter((option) => {
+      if (seenUrls.has(option.url)) return false;
+      seenUrls.add(option.url);
+      return true;
+    });
+
+    if (!groupOptions.length) return [];
+
+    const video = groupOptions.find((option) => option.type === "video");
+    const image = groupOptions.find((option) => option.type === "image");
+    const audio = groupOptions.find((option) => option.type === "audio");
+
+    const kind: "video" | "audio" | "image" =
+      video ? "video" : image ? "image" : audio ? "audio" : "video";
+
+    const nodeThumbnail =
+      firstUrl(
+        group.map((candidate) => candidate.node),
+        [
+          "thumbnail",
+          "thumbnail_url",
+          "thumbnailUrl",
+          "thumb",
+          "poster",
+          "preview",
+          "preview_url",
+          "previewUrl",
+        ],
+      ) ?? undefined;
+
+    const previewUrl = image?.url ?? nodeThumbnail ?? video?.url;
+
+    const label =
+      video?.qualityLabel ??
+      image?.qualityLabel ??
+      audio?.qualityLabel ??
+      groupOptions[0]?.label;
+
+    return [
+      {
+        id: `media-${index + 1}`,
+        kind,
+        previewUrl,
+        thumbnailUrl: nodeThumbnail,
+        label,
+        options: groupOptions,
+      },
+    ];
+  });
+
+
   const options = dedupe(
-    sortOptions(
-      candidates
-        .map(buildOption)
-        .filter((option): option is DownloadOption => option !== null),
-    ),
+    sortOptions(items.flatMap((item) => item.options)),
   );
 
   if (!options.length) {
@@ -765,6 +832,7 @@ export function normalizeAioResponse(
       platformLabel: platformLabel(platform),
     },
     media,
+    items,
     options,
   };
 }

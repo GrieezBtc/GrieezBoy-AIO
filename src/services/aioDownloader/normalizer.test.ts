@@ -108,6 +108,53 @@ describe("normalizeAioResponse — all eight platforms", () => {
     expect(result.options.some((option) => option.url === url)).toBe(false);
   });
 
+  it("creates one gallery item per Pinterest image", () => {
+    const url = "https://www.pinterest.com/pin/123456789/";
+    const result = normalizeAioResponse(
+      mockAioUpstream(url, "pinterest"),
+      { url },
+    );
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    expect(result.items).toHaveLength(2);
+    expect(result.items.every((item) => item.kind === "image")).toBe(true);
+    expect(result.items.every((item) => item.options.length === 1)).toBe(true);
+  });
+
+  it("keeps Twitter quality variants inside one media item", () => {
+    const url = "https://twitter.com/example/status/123456789";
+    const result = normalizeAioResponse(
+      mockAioUpstream(url, "twitter"),
+      { url },
+    );
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].kind).toBe("video");
+    expect(result.items[0].options.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("creates separate gallery items for Instagram media", () => {
+    const url = "https://www.instagram.com/p/ABC123/";
+    const result = normalizeAioResponse(
+      mockAioUpstream(url, "instagram"),
+      { url },
+    );
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+
+    expect(result.items).toHaveLength(3);
+    expect(result.items[0].kind).toBe("video");
+    expect(
+      result.items.filter((item) => item.kind === "image"),
+    ).toHaveLength(2);
+  });
+
   it("marks carousels when several images and no video exist", () => {
     const url = SOURCE_URLS.pinterest;
     const result = normalizeAioResponse(mockAioUpstream(url, "pinterest"), { url });
