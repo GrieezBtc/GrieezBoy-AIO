@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/Toast";
 import type { DownloadOption } from "@/services/aioDownloader/types";
+import { triggerMediaDownload } from "@/lib/mediaDownload";
 
 const GROUPS: Array<{ type: DownloadOption["type"]; label: string; glyph: string }> = [
   { type: "video", label: "Video streams", glyph: "▶" },
@@ -21,11 +22,11 @@ function Badge({ children }: { children: React.ReactNode }) {
 function OptionRow({
   option,
   index,
-  filename,
+  title,
 }: {
   option: DownloadOption;
   index: number;
-  filename: string;
+  title?: string;
 }) {
   const { push } = useToast();
   const [copied, setCopied] = useState(false);
@@ -91,20 +92,20 @@ function OptionRow({
           <span aria-hidden>{copied ? "✓" : "⧉"}</span>
           {copied ? "Copied" : "Copy"}
         </button>
-        <a
-          href={`/api/media?url=${encodeURIComponent(option.url)}&filename=${encodeURIComponent(filename)}`}
-          download={filename}
-          onClick={() =>
+        <button
+          type="button"
+          onClick={() => {
+            triggerMediaDownload(option, title);
             push({
               title: "Download started",
               body: option.label,
               tone: "ok",
-            })
-          }
+            });
+          }}
           className="btn btn-primary h-10 min-h-[44px] flex-1 px-4 text-[0.62rem] sm:flex-none"
         >
           <span aria-hidden>⤓</span> Download
-        </a>
+        </button>
       </div>
     </li>
   );
@@ -117,12 +118,6 @@ export function DownloadOptions({
   options: DownloadOption[];
   title?: string;
 }) {
-  const safeName = (title ?? "griezboy-media")
-    .replace(/[^\w\s.-]/g, "")
-    .trim()
-    .slice(0, 60)
-    .replace(/\s+/g, "_");
-
   return (
     <div className="space-y-5">
       {GROUPS.map((group) => {
@@ -141,7 +136,7 @@ export function DownloadOptions({
                   key={option.id}
                   option={option}
                   index={index}
-                  filename={`${safeName || "media"}.${option.format ?? "bin"}`}
+                  title={title}
                 />
               ))}
             </ul>
