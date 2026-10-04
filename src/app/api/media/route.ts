@@ -14,7 +14,8 @@ const ALLOWED_HOSTS = new Set([
   "v1.pinimg.com",
   "video.twimg.com",
   "p16-common-sign.tiktokcdn-eu.com",
-]);
+
+  "i.pinimg.com",]);
 
 function isAllowedHostname(hostname: string): boolean {
   return (
