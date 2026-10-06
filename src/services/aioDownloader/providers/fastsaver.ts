@@ -23,6 +23,73 @@ function key(): string | null {
   return value || null;
 }
 
+function isFacebookHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+
+  return (
+    host === "facebook.com" ||
+    host.endsWith(".facebook.com") ||
+    host === "fb.com" ||
+    host.endsWith(".fb.com") ||
+    host === "fb.watch" ||
+    host.endsWith(".fb.watch")
+  );
+}
+
+function isFacebookShareUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+
+    if (!isFacebookHost(parsed.hostname)) {
+      return false;
+    }
+
+    return /^\/share\/(?:r\/)?/i.test(parsed.pathname);
+  } catch {
+    return false;
+  }
+}
+
+async function resolveFacebookShareUrl(
+  url: string,
+  signal: AbortSignal,
+): Promise<string> {
+  if (!isFacebookShareUrl(url)) {
+    return url;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36",
+        accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+      redirect: "follow",
+      signal,
+      cache: "no-store",
+    });
+
+    const finalUrl = response.url;
+
+    try {
+      const parsedFinal = new URL(finalUrl);
+
+      if (isFacebookHost(parsedFinal.hostname)) {
+        return parsedFinal.toString();
+      }
+    } catch {
+      // Keep the original URL when the final redirect is not a valid URL.
+    }
+  } catch {
+    // Let FastSaver attempt the original URL if Facebook redirect resolution fails.
+  }
+
+  return url;
+}
+
 export async function resolveFastSaver(
   url: string,
   platform: SupportedPlatform,
@@ -38,8 +105,13 @@ export async function resolveFastSaver(
   signal?.addEventListener("abort", onAbort);
 
   try {
+    const targetUrl =
+      platform === "facebook"
+        ? await resolveFacebookShareUrl(url, controller.signal)
+        : url;
+
     const infoUrl = new URL(`${BASE_URL}/youtube/info`);
-    infoUrl.searchParams.set("url", url);
+    infoUrl.searchParams.set("url", targetUrl);
 
     /*
      * FastSaver uses the same API family for supported platforms.
@@ -49,7 +121,7 @@ export async function resolveFastSaver(
     const endpoint =
       platform === "youtube"
         ? infoUrl.toString()
-        : `${BASE_URL}/fetch?url=${encodeURIComponent(url)}`;
+        : `${BASE_URL}/fetch?url=${encodeURIComponent(targetUrl)}`;
 
     const response = await fetch(endpoint, {
       method: "GET",
@@ -83,7 +155,7 @@ export async function resolveFastSaver(
       return resolveYoutube(body as FastSaverBody, url, signal);
     }
 
-    return normalizeAioResponse(body, { url, platform });
+    return normalizeAioResponse(body, { url: targetUrl, platform });
   } catch (error) {
     const name = (error as { name?: string } | null)?.name;
 
