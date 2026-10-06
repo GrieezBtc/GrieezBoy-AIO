@@ -50,6 +50,35 @@ function isFacebookShareUrl(value: string): boolean {
   }
 }
 
+function extractFacebookCanonicalUrl(html: string): string | null {
+  const patterns = [
+    /<meta[^>]+property=["']og:url["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:url["']/i,
+    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i,
+    /<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+
+    if (!match?.[1]) {
+      continue;
+    }
+
+    try {
+      const candidate = new URL(match[1]);
+
+      if (isFacebookHost(candidate.hostname)) {
+        return candidate.toString();
+      }
+    } catch {
+      // Ignore malformed metadata.
+    }
+  }
+
+  return null;
+}
+
 async function resolveFacebookShareUrl(
   url: string,
   signal: AbortSignal,
@@ -77,18 +106,54 @@ async function resolveFacebookShareUrl(
     try {
       const parsedFinal = new URL(finalUrl);
 
-      if (isFacebookHost(parsedFinal.hostname)) {
+      if (
+        isFacebookHost(parsedFinal.hostname) &&
+        !isFacebookShareUrl(parsedFinal.toString())
+      ) {
+        console.info("[facebook] share URL resolved", {
+          status: response.status,
+          host: parsedFinal.hostname,
+          path: parsedFinal.pathname.slice(0, 120),
+        });
+
         return parsedFinal.toString();
       }
     } catch {
-      // Keep the original URL when the final redirect is not a valid URL.
+      // Continue with HTML metadata extraction.
     }
-  } catch {
-    // Let FastSaver attempt the original URL if Facebook redirect resolution fails.
+
+    const html = await response.text();
+    const canonicalUrl = extractFacebookCanonicalUrl(html);
+
+    if (canonicalUrl) {
+      console.info("[facebook] canonical URL extracted", {
+        status: response.status,
+        path: new URL(canonicalUrl).pathname.slice(0, 120),
+      });
+
+      return canonicalUrl;
+    }
+
+    console.warn("[facebook] could not resolve share URL", {
+      status: response.status,
+      finalHost: (() => {
+        try {
+          return new URL(finalUrl).hostname;
+        } catch {
+          return "invalid";
+        }
+      })(),
+    });
+  } catch (error) {
+    console.warn("[facebook] share URL resolution failed", {
+      name: error instanceof Error ? error.name : "unknown",
+    });
   }
 
   return url;
 }
+
+
 
 export async function resolveFastSaver(
   url: string,
