@@ -57,7 +57,7 @@ export async function GET(request: Request) {
 
   let pageToken: string | undefined;
 
-  if (query && page > 0) {
+  if (page > 0) {
     pageToken =
       (await cacheGet<string>(
         tokenCacheKey(query, page),
@@ -99,12 +99,15 @@ export async function GET(request: Request) {
     });
   }
 
-  /*
-   * The client currently receives only HubFeed, so derive the next token
-   * from the internal response isn't possible here. The next step will
-   * expose the token through the service layer without sending it to the
-   * browser directly.
-   */
+  if (result.nextPageToken) {
+    await cacheSet(
+      tokenCacheKey(query, page + 1),
+      "hub",
+      result.nextPageToken,
+      TOKEN_TTL_SECONDS,
+    );
+  }
+
   await cacheSet(cacheKey, "hub", feed, 180);
 
   return Response.json(feed, {

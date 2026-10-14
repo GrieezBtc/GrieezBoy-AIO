@@ -146,6 +146,10 @@ export async function fetchHubFeed(options: {
     params.chart = "mostPopular";
     params.regionCode = "NG";
 
+    if (options.pageToken) {
+      params.pageToken = options.pageToken;
+    }
+
     const result = await requestJson(
       "videos",
       params,
