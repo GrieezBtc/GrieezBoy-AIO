@@ -1,6 +1,8 @@
 "use client";
 
-import { triggerMediaDownload } from "@/lib/mediaDownload";
+import { useDownloads } from "@/components/DownloadManager";
+import { formatBytes } from "@/lib/format";
+import { safeMediaName } from "@/lib/mediaDownload";
 import type {
   DownloadOption,
   NormalizedMediaItem,
@@ -56,6 +58,7 @@ function MediaCard({
   item: NormalizedMediaItem;
   title?: string;
 }) {
+  const { startDownload } = useDownloads();
   const [downloading, setDownloading] = useState(false);
 
   const primary =
@@ -67,7 +70,11 @@ function MediaCard({
     setDownloading(true);
 
     try {
-      triggerMediaDownload(option, title);
+      startDownload({
+        title: title ?? option.label,
+        filename: `${safeMediaName(title) || "media"}.${option.format ?? "bin"}`,
+        source: { url: option.url, expectedBytes: option.fileSize },
+      });
     } finally {
       window.setTimeout(() => setDownloading(false), 700);
     }
@@ -139,6 +146,7 @@ function MediaCard({
                     {[
                       option.format?.toUpperCase(),
                       option.mimeType,
+                      option.fileSize ? formatBytes(option.fileSize) : option.fileSizeLabel,
                     ]
                       .filter(Boolean)
                       .join(" · ") || "media"}

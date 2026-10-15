@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useDownloads } from "@/components/DownloadManager";
 import { useToast } from "@/components/Toast";
+import { safeMediaName } from "@/lib/mediaDownload";
 import { VideoCard, VideoCardSkeleton } from "@/components/hub/VideoCard";
 import { VideoPlayer } from "@/components/hub/VideoPlayer";
 import type { HubResponse, HubVideo } from "@/services/videoHub/types";
@@ -12,6 +14,7 @@ type HubMode = "feed" | "search";
 
 export function VideoHubView() {
   const { push } = useToast();
+  const { startDownload } = useDownloads();
 
   const [mode, setMode] = useState<HubMode>("feed");
   const [input, setInput] = useState("");
@@ -311,76 +314,49 @@ export function VideoHubView() {
         return;
       }
 
-      try {
-        const response = await fetch("/api/download", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({
-            url: video.sourceUrl,
-          }),
-        });
+      startDownload({
+        title: video.title,
+        filename: `${safeMediaName(video.title) || "youtube-video"}.mp4`,
+        source: async () => {
+          const response = await fetch("/api/download", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ url: video.sourceUrl }),
+          });
 
-        const payload = await response.json();
+          const payload = await response.json();
 
-        if (!response.ok || !payload?.success) {
-          throw new Error(
-            payload?.error?.message ??
-              "Unable to resolve the download.",
-          );
-        }
+          if (!response.ok || !payload?.success) {
+            throw new Error(
+              payload?.error?.message ?? "Unable to resolve the download.",
+            );
+          }
 
-        const options = Array.isArray(payload.options)
-          ? payload.options
-          : [];
+          const options: Array<{
+            url?: string;
+            type?: string;
+            quality?: string;
+            fileSize?: number;
+          }> = Array.isArray(payload.options) ? payload.options : [];
 
-        const preferred =
-          options.find(
-            (option: { url?: string; quality?: string }) =>
-              option.url &&
-              typeof option.url === "string" &&
-              option.quality?.toLowerCase().includes("high"),
-          ) ??
-          options.find(
-            (option: { url?: string }) =>
-              option.url &&
-              typeof option.url === "string",
+          const usable = options.filter(
+            (option) => typeof option.url === "string" && option.url,
           );
 
-        if (!preferred?.url) {
-          throw new Error("No downloadable format was returned.");
-        }
+          const preferred =
+            usable.find((option) => option.quality?.toLowerCase().includes("high")) ??
+            usable.find((option) => option.type === "video") ??
+            usable[0];
 
-        const filename =
-          `${video.title.replace(/[^\\w\\s.-]/g, "").trim().slice(0, 80) || "youtube-video"}.mp4`;
+          if (!preferred?.url) {
+            throw new Error("No downloadable format was returned.");
+          }
 
-        const downloadUrl =
-          `/api/media?url=${encodeURIComponent(preferred.url)}` +
-          `&filename=${encodeURIComponent(filename)}`;
-
-        const anchor = document.createElement("a");
-        anchor.href = downloadUrl;
-        anchor.download = filename;
-        anchor.click();
-
-        push({
-          title: "Download started",
-          body: video.title,
-          tone: "ok",
-        });
-      } catch (caught) {
-        push({
-          title: "Download failed",
-          body:
-            caught instanceof Error
-              ? caught.message
-              : "Unable to resolve this video.",
-          tone: "error",
-        });
-      }
+          return { url: preferred.url, expectedBytes: preferred.fileSize };
+        },
+      });
     },
-    [push],
+    [push, startDownload],
   );
 
   const retry = useCallback(() => {

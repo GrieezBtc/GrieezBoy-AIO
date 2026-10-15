@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useToast } from "@/components/Toast";
 import type { DownloadOption } from "@/services/aioDownloader/types";
-import { triggerMediaDownload } from "@/lib/mediaDownload";
+import { useDownloads } from "@/components/DownloadManager";
+import { safeMediaName } from "@/lib/mediaDownload";
 
 const GROUPS: Array<{ type: DownloadOption["type"]; label: string; glyph: string }> = [
   { type: "video", label: "Video streams", glyph: "▶" },
@@ -29,6 +30,7 @@ function OptionRow({
   title?: string;
 }) {
   const { push } = useToast();
+  const { startDownload } = useDownloads();
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -94,14 +96,13 @@ function OptionRow({
         </button>
         <button
           type="button"
-          onClick={() => {
-            triggerMediaDownload(option, title);
-            push({
-              title: "Download started",
-              body: option.label,
-              tone: "ok",
-            });
-          }}
+          onClick={() =>
+            startDownload({
+              title: title ?? option.label,
+              filename: `${safeMediaName(title) || "media"}.${option.format ?? "bin"}`,
+              source: { url: option.url, expectedBytes: option.fileSize },
+            })
+          }
           className="btn btn-primary h-10 min-h-[44px] flex-1 px-4 text-[0.62rem] sm:flex-none"
         >
           <span aria-hidden>⤓</span> Download

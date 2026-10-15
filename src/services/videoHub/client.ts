@@ -77,6 +77,61 @@ function normalizeYouTubeItems(body: unknown): HubResponse {
   });
 }
 
+
+/*
+ * YouTube's search.list endpoint only returns snippet data. Duration
+ * (contentDetails) and view counts (statistics) are only available from
+ * videos.list, so we look the search results up by id and keep the search
+ * ordering. If the lookup fails we fall back to the plain search items so
+ * search never breaks just because durations are unavailable.
+ */
+async function enrichSearchBody(
+  body: Record<string, unknown>,
+  signal?: AbortSignal,
+): Promise<Record<string, unknown>> {
+  const rawItems = Array.isArray(body.items) ? body.items : [];
+
+  const ids = rawItems
+    .map((item) => {
+      const id = (item as { id?: { videoId?: unknown } } | null)?.id;
+      return typeof id?.videoId === "string" ? id.videoId : null;
+    })
+    .filter((id): id is string => Boolean(id));
+
+  if (!ids.length) return body;
+
+  try {
+    const details = await requestJson(
+      "videos",
+      {
+        part: "snippet,contentDetails,statistics",
+        id: ids.join(","),
+        maxResults: String(ids.length),
+      },
+      signal,
+    );
+
+    if (!details.ok) return body;
+
+    const detailItems = (details.body as { items?: unknown } | null)?.items;
+    if (!Array.isArray(detailItems)) return body;
+
+    const byId = new Map<string, unknown>();
+    for (const item of detailItems) {
+      const id = (item as { id?: unknown } | null)?.id;
+      if (typeof id === "string") byId.set(id, item);
+    }
+
+    const ordered = ids
+      .map((id) => byId.get(id))
+      .filter((item) => item !== undefined);
+
+    return ordered.length ? { ...body, items: ordered } : body;
+  } catch {
+    return body;
+  }
+}
+
 export function isHubLive(): boolean {
   return Boolean(getApiKey());
 }
@@ -128,7 +183,10 @@ export async function fetchHubFeed(options: {
         return { feed: hubError("UPSTREAM_ERROR") };
       }
 
-      const body = result.body as Record<string, unknown>;
+      const body = await enrichSearchBody(
+        result.body as Record<string, unknown>,
+        options.signal,
+      );
 
       return {
         feed: normalizeYouTubeItems({

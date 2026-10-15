@@ -7,6 +7,7 @@ import {
   ThemeProvider,
   themeBootstrapScript,
 } from "@/components/providers/ThemeProvider";
+import { DownloadProvider } from "@/components/DownloadManager";
 import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="antialiased">
         <ThemeProvider>
           <ToastProvider>
+            <DownloadProvider>
             <a
               href="#main"
               className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:border focus:border-[var(--accent)] focus:bg-[var(--panel-solid)] focus:px-3 focus:py-2 focus:text-xs"
@@ -73,6 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </main>
             <Footer />
             <PwaRegister />
+            </DownloadProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>
