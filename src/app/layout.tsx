@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { PwaRegister } from "@/components/PwaRegister";
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <PwaRegister />
           </ToastProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
