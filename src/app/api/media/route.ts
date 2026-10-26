@@ -7,6 +7,7 @@ const ALLOWED_HOSTS = new Set([
   "api.fastsaver.io",
   "rhaegal.fastsaver.io",
   "viserion.fastsaver.io",
+  "drogon.fastsaver.io",
   "api.saveapi.org",
   "dl-7.ytdload.com",
   "api.tiktokv.com",
