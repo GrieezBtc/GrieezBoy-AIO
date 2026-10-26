@@ -33,6 +33,11 @@ export const ERROR_CATALOG: Record<DownloadErrorCode, ErrorSpec> = {
     message: "The engine timed out while resolving this media. Try again.",
     retryable: true,
   },
+  PROVIDER_QUOTA_EXCEEDED: {
+    message:
+      "The download provider has run out of credits. Please try again later.",
+    retryable: false,
+  },
   UPSTREAM_ERROR: {
     message: "The media engine is temporarily unavailable. Try again shortly.",
     retryable: true,
@@ -63,6 +68,7 @@ export const ERROR_TITLES: Record<DownloadErrorCode, string> = {
   RATE_LIMITED: "RATE LIMITED",
   TIMEOUT: "REQUEST TIMEOUT",
   UPSTREAM_ERROR: "UPSTREAM FAILURE",
+  PROVIDER_QUOTA_EXCEEDED: "PROVIDER QUOTA EXCEEDED",
   MALFORMED_RESPONSE: "MALFORMED RESPONSE",
   NO_MEDIA: "NO MEDIA",
   NETWORK_ERROR: "NETWORK ERROR",
@@ -96,9 +102,10 @@ export function codeFromHttpStatus(status: number): DownloadErrorCode {
 }
 
 const TEXT_PATTERNS: Array<[RegExp, DownloadErrorCode]> = [
+  [/\b(no credits left|out of credits|credits exhausted|credits depleted|insufficient credits|quota exceeded|quota exhausted|quota depleted|credit balance is zero|no remaining credits)\b/i, "PROVIDER_QUOTA_EXCEEDED"],
   [/\b(private|restricted|login required|sign in|age.?restricted|protected)\b/i, "PRIVATE_CONTENT"],
   [/\b(not found|unavailable|deleted|removed|does not exist|no such)\b/i, "CONTENT_NOT_FOUND"],
-  [/\b(rate.?limit|too many requests|quota|throttl)\b/i, "RATE_LIMITED"],
+  [/\b(rate.?limit|too many requests|throttl)\b/i, "RATE_LIMITED"],
   [/\b(timed? ?out|timeout|deadline)\b/i, "TIMEOUT"],
   [/\b(invalid url|bad url|malformed url|unsupported url)\b/i, "INVALID_URL"],
   [/\b(unsupported|not supported)\b/i, "UNSUPPORTED_PLATFORM"],

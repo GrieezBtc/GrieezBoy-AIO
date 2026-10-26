@@ -71,6 +71,7 @@ export type DownloadErrorCode =
   | "RATE_LIMITED"
   | "TIMEOUT"
   | "UPSTREAM_ERROR"
+  | "PROVIDER_QUOTA_EXCEEDED"
   | "MALFORMED_RESPONSE"
   | "NO_MEDIA"
   | "NETWORK_ERROR"
