@@ -14,6 +14,7 @@ const NAV: NavItem[] = [
   { href: "/video-hub", label: "Video Hub", glyph: "▤" },
   { href: "/history", label: "History", glyph: "◷" },
   { href: "/about", label: "About", glyph: "ⓘ" },
+  { href: "/contact", label: "Report", glyph: "⚑" },
 ];
 
 type InstallPromptEvent = Event & {
@@ -147,7 +148,7 @@ export function Navbar() {
         aria-label="Primary mobile"
         className="fixed inset-x-0 bottom-0 z-[100] w-full rounded-t-3xl border-t border-line bg-[var(--panel)] shadow-[var(--glass-edge)] pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-150 md:hidden"
       >
-        <ul className="mx-auto grid w-full max-w-lg grid-cols-4">
+        <ul className="mx-auto grid w-full max-w-lg grid-cols-5">
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (

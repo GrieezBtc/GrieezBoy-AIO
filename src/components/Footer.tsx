@@ -3,7 +3,7 @@ import { PLATFORMS } from "@/services/aioDownloader/platforms";
 import { LogoGlyph } from "@/components/Wordmark";
 
 const SOCIALS = [
-  { label: "WhatsApp", href: "https://wa.me/2349023326317", glyph: "WA" },
+  { label: "WhatsApp", href: "https://wa.me/2348107461934", glyph: "WA" },
   { label: "X", href: "https://x.com/grieezboy01", glyph: "X" },
   { label: "Telegram", href: "https://t.me/grieezboy001", glyph: "TG" },
 ];
@@ -77,11 +77,6 @@ export function Footer() {
               <li>
                 <Link href="/terms" className="text-dim transition-colors hover:text-accent">
                   Terms
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-dim transition-colors hover:text-accent">
-                  Report an issue
                 </Link>
               </li>
             </ul>
