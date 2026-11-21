@@ -56,26 +56,23 @@ export function UrlInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="corner-marks panel relative w-full p-3 sm:p-4"
+      className="panel relative w-full p-3 sm:p-4"
       style={{ borderColor: detected ? accent : "var(--line-strong)" }}
     >
       <div className="flex items-center justify-between gap-2 pb-2">
         <label
           htmlFor="media-url"
-          className="t-label flex items-center gap-2 text-[0.6rem]"
+          className="t-label flex items-center gap-2 text-[0.72rem]"
         >
-          <span aria-hidden style={{ color: accent }}>
-            &gt;
-          </span>
-          Paste media url
+          Paste a media link
         </label>
-        <span className="t-label hidden text-[0.55rem] sm:inline">
-          ⌘/CTRL + K focus · ⌘/CTRL + ⏎ execute
+        <span className="t-label hidden text-[0.72rem] sm:inline">
+          Ctrl/⌘ + K to focus · Ctrl/⌘ + Enter to download
         </span>
       </div>
 
       <div
-        className="relative flex flex-col gap-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_72%,transparent)] p-2 sm:flex-row sm:items-center"
+        className="rounded-2xl relative flex flex-col gap-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_45%,transparent)] p-2 sm:flex-row sm:items-center"
         style={{ borderColor: detected ? `${accent}55` : "var(--line)" }}
       >
         <div className="flex min-w-0 flex-1 items-center gap-2 px-1">
@@ -84,7 +81,7 @@ export function UrlInput({
             className="shrink-0 text-sm font-bold select-none"
             style={{ color: accent }}
           >
-            ▸
+            ↗
           </span>
           <input
             id="media-url"
@@ -106,7 +103,7 @@ export function UrlInput({
             <button
               type="button"
               onClick={onClear}
-              className="grid h-9 w-9 shrink-0 place-items-center border border-line text-faint transition-colors hover:border-[var(--line-strong)] hover:text-ink"
+              className="rounded-full grid h-9 w-9 shrink-0 place-items-center border border-line text-faint transition-colors hover:border-[var(--line-strong)] hover:text-ink"
               aria-label="Clear URL"
             >
               <span aria-hidden>✕</span>
@@ -118,7 +115,7 @@ export function UrlInput({
           <button
             type="button"
             onClick={onPaste}
-            className="btn flex-1 px-3 text-[0.65rem] sm:flex-none"
+            className="btn flex-1 px-3 text-[0.8rem] sm:flex-none"
           >
             <span aria-hidden>⎘</span> Paste
           </button>
@@ -130,13 +127,13 @@ export function UrlInput({
             {loading ? (
               <>
                 <span aria-hidden className="live-dot">
-                  ▮
+                  ●
                 </span>
                 Working
               </>
             ) : (
               <>
-                <span aria-hidden>⏎</span> Execute
+                <span aria-hidden>↓</span> Download
               </>
             )}
           </button>
@@ -146,16 +143,14 @@ export function UrlInput({
       <div
         id="url-status"
         aria-live="polite"
-        className="mt-2 flex min-h-[20px] flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem]"
+        className="mt-2 flex min-h-[20px] flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem]"
       >
         {validationMessage ? (
-          <span style={{ color: "var(--danger)" }}>[!] {validationMessage}</span>
+          <span style={{ color: "var(--danger)" }}>{validationMessage}</span>
         ) : (
           <span className="text-faint">
             {statusLine}
-            <span className="caret ml-1" aria-hidden>
-              ▌
-            </span>
+            
           </span>
         )}
       </div>

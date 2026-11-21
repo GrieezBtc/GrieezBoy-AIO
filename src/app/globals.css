@@ -1,53 +1,85 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ *
- * GRIEEZBOY AIO — design tokens
+ * GRIEEZBOY AIO — glass design tokens
+ * Frosted translucent surfaces over a soft, colourful ambient backdrop.
  * ------------------------------------------------------------------ */
 
 :root {
   color-scheme: dark;
-  --bg: #07080a;
-  --bg-deep: #050507;
-  --panel: rgba(18, 20, 24, 0.72);
-  --panel-solid: #101216;
-  --panel-raised: rgba(30, 33, 39, 0.78);
-  --line: rgba(255, 255, 255, 0.09);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --text: #e8ecf1;
-  --text-dim: #99a3b0;
-  --text-faint: #646d79;
-  --accent: #35f0a0;
-  --accent-soft: rgba(53, 240, 160, 0.14);
-  --accent-line: rgba(53, 240, 160, 0.4);
-  --violet: #8b7dff;
-  --amber: #ffc46b;
-  --danger: #ff5f6d;
-  --grid: rgba(255, 255, 255, 0.035);
-  --glow: 0 0 0 1px rgba(53, 240, 160, 0.18), 0 12px 48px -18px rgba(53, 240, 160, 0.4);
-  --shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.9);
+
+  /* backdrop */
+  --bg: #0a0d1c;
+  --bg-deep: #070916;
+  --orb-1: rgba(99, 102, 241, 0.55);
+  --orb-2: rgba(56, 189, 248, 0.38);
+  --orb-3: rgba(217, 70, 239, 0.34);
+
+  /* glass surfaces */
+  --panel: rgba(255, 255, 255, 0.07);
+  --panel-solid: #161a33;
+  --panel-raised: rgba(255, 255, 255, 0.12);
+  --glass-soft: rgba(255, 255, 255, 0.05);
+  --glass-hover: rgba(255, 255, 255, 0.1);
+  --glass-blur: 22px;
+  --line: rgba(255, 255, 255, 0.13);
+  --line-strong: rgba(255, 255, 255, 0.26);
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+
+  /* text */
+  --text: #f1f4ff;
+  --text-dim: #b4bcd6;
+  --text-faint: #8a93b2;
+
+  /* colour */
+  --accent: #7dd3fc;
+  --accent-2: #a78bfa;
+  --accent-soft: rgba(125, 211, 252, 0.16);
+  --accent-line: rgba(125, 211, 252, 0.5);
+  --on-accent: #08111f;
+  --violet: #a78bfa;
+  --amber: #fcd34d;
+  --danger: #fb7185;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+  --glow: 0 10px 30px -10px rgba(125, 211, 252, 0.55);
+  --shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.7);
 }
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f2f3f5;
-  --bg-deep: #e8eaee;
-  --panel: rgba(255, 255, 255, 0.82);
+
+  --bg: #e9edfb;
+  --bg-deep: #dde3f6;
+  --orb-1: rgba(99, 102, 241, 0.38);
+  --orb-2: rgba(56, 189, 248, 0.42);
+  --orb-3: rgba(244, 114, 182, 0.32);
+
+  --panel: rgba(255, 255, 255, 0.55);
   --panel-solid: #ffffff;
-  --panel-raised: rgba(255, 255, 255, 0.95);
-  --line: rgba(10, 14, 20, 0.12);
-  --line-strong: rgba(10, 14, 20, 0.24);
-  --text: #12161c;
-  --text-dim: #4b5563;
-  --text-faint: #6b7480;
-  --accent: #0c7a4d;
-  --accent-soft: rgba(12, 122, 77, 0.1);
-  --accent-line: rgba(12, 122, 77, 0.32);
-  --violet: #5b48d6;
-  --amber: #a86a00;
-  --danger: #c02334;
-  --grid: rgba(10, 14, 20, 0.05);
-  --glow: 0 0 0 1px rgba(12, 122, 77, 0.16), 0 10px 40px -22px rgba(12, 122, 77, 0.5);
-  --shadow: 0 20px 44px -32px rgba(10, 20, 30, 0.45);
+  --panel-raised: rgba(255, 255, 255, 0.8);
+  --glass-soft: rgba(255, 255, 255, 0.42);
+  --glass-hover: rgba(255, 255, 255, 0.75);
+  --line: rgba(255, 255, 255, 0.85);
+  --line-strong: rgba(30, 41, 90, 0.25);
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(30, 41, 90, 0.05);
+
+  --text: #141a36;
+  --text-dim: #444d70;
+  --text-faint: #646d8f;
+
+  --accent: #1d5fd1;
+  --accent-2: #6d3fd6;
+  --accent-soft: rgba(29, 95, 209, 0.12);
+  --accent-line: rgba(29, 95, 209, 0.4);
+  --on-accent: #ffffff;
+  --violet: #6d3fd6;
+  --amber: #a16207;
+  --danger: #c0213a;
+
+  --glow: 0 10px 28px -10px rgba(29, 95, 209, 0.5);
+  --shadow: 0 18px 44px -22px rgba(40, 50, 110, 0.35);
 }
 
 @theme inline {
@@ -66,9 +98,10 @@
   --color-violet: var(--violet);
   --color-amber: var(--amber);
   --color-danger: var(--danger);
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", "Space Mono", ui-monospace,
-    SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  --font-sans: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  /* kept for the few places that really show code / technical values */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 * {
@@ -82,98 +115,96 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: var(--font-mono);
-  font-feature-settings: "ss01", "cv01";
+  font-family: var(--font-sans);
   min-height: 100dvh;
   overflow-x: hidden;
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%);
-  background-size: 44px 44px, 44px 44px, 100% 100%;
-  background-attachment: fixed;
+  position: relative;
+}
+
+/* ambient colour orbs that the glass blurs against */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(42vmax 42vmax at 12% 8%, var(--orb-1), transparent 70%),
+    radial-gradient(38vmax 38vmax at 92% 22%, var(--orb-2), transparent 70%),
+    radial-gradient(46vmax 46vmax at 70% 98%, var(--orb-3), transparent 70%),
+    linear-gradient(180deg, var(--bg), var(--bg-deep));
 }
 
 ::selection {
   background: var(--accent);
-  color: var(--bg-deep);
+  color: var(--on-accent);
 }
 
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 /* ---------------------------- typography --------------------------- */
 
 .t-label {
-  font-size: clamp(0.6rem, 0.55rem + 0.2vw, 0.7rem);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: clamp(0.68rem, 0.64rem + 0.2vw, 0.76rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--text-faint);
 }
 
 .t-mono-xs {
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
 }
 
 .display {
-  font-size: clamp(1.9rem, 1.1rem + 4.2vw, 4.4rem);
-  line-height: 0.95;
-  letter-spacing: -0.045em;
-  font-weight: 700;
+  font-size: clamp(2.1rem, 1.2rem + 4.4vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 800;
 }
 
 .subdisplay {
-  font-size: clamp(0.95rem, 0.85rem + 0.5vw, 1.25rem);
-  line-height: 1.5;
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  line-height: 1.55;
 }
 
 /* ---------------------------- surfaces ----------------------------- */
 
-.panel {
-  background: var(--panel);
+.panel,
+.glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), var(--panel) 45%);
   border: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+  box-shadow: var(--glass-edge), var(--shadow);
 }
 
-.panel-flat {
-  background: color-mix(in srgb, var(--panel-solid) 70%, transparent);
+[data-theme="light"] .panel,
+[data-theme="light"] .glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.78), var(--panel) 55%);
+}
+
+.panel-flat,
+.glass-soft {
+  background: var(--glass-soft);
   border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: var(--glass-edge);
 }
 
-.hatch {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    var(--line) 0 1px,
-    transparent 1px 7px
-  );
-}
-
+/* retired terminal decorations — kept as no-ops so old markup stays safe */
+.hatch,
 .corner-marks::before,
-.corner-marks::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border: 1px solid var(--accent-line);
-  pointer-events: none;
-}
-.corner-marks::before {
-  top: -1px;
-  left: -1px;
-  border-right: 0;
-  border-bottom: 0;
-}
-.corner-marks::after {
-  bottom: -1px;
-  right: -1px;
-  border-left: 0;
-  border-top: 0;
+.corner-marks::after,
+.scanline::after {
+  display: none;
 }
 
 /* ---------------------------- controls ----------------------------- */
@@ -184,29 +215,34 @@ body {
   justify-content: center;
   gap: 0.5rem;
   min-height: 44px;
-  padding: 0 1rem;
+  padding: 0 1.1rem;
   border: 1px solid var(--line-strong);
-  background: color-mix(in srgb, var(--panel-solid) 60%, transparent);
+  border-radius: 999px;
+  background: var(--glass-soft);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--glass-edge);
   color: var(--text);
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0;
   cursor: pointer;
   transition:
-    transform 0.12s ease,
+    transform 0.14s ease,
     border-color 0.18s ease,
     background-color 0.18s ease,
+    box-shadow 0.18s ease,
     color 0.18s ease;
 }
 
 .btn:hover:not(:disabled) {
   border-color: var(--accent-line);
-  color: var(--accent);
-  background: var(--accent-soft);
+  background: var(--glass-hover);
+  color: var(--text);
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.99);
 }
 
 .btn:disabled {
@@ -215,53 +251,38 @@ body {
 }
 
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #04120c;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: rgba(255, 255, 255, 0.45);
+  color: var(--on-accent);
   font-weight: 700;
-  box-shadow: var(--glow);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), var(--glow);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--accent) 86%, #ffffff);
-  color: #04120c;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--on-accent);
+  filter: brightness(1.08);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .btn-ghost {
   background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
   border-color: var(--line);
   color: var(--text-dim);
 }
 
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+}
+
 /* ---------------------------- effects ------------------------------ */
-
-@keyframes scan {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(400%);
-  }
-}
-
-.scanline::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  height: 28%;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    color-mix(in srgb, var(--accent) 22%, transparent),
-    transparent
-  );
-  animation: scan 1.7s linear infinite;
-  pointer-events: none;
-}
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  50% { opacity: 0.3; }
 }
 
 .live-dot {
@@ -275,7 +296,8 @@ body {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: color-mix(in srgb, var(--text) 7%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
 .skeleton::after {
@@ -286,7 +308,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    color-mix(in srgb, var(--text) 8%, transparent),
+    color-mix(in srgb, var(--text) 12%, transparent),
     transparent
   );
   animation: shimmer 1.4s infinite;
@@ -304,16 +326,11 @@ body {
 }
 
 .reveal {
-  animation: reveal-up 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-
-@keyframes blink-caret {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  animation: reveal-up 0.38s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
 .caret {
-  animation: blink-caret 1.05s step-end infinite;
+  display: none;
 }
 
 @keyframes toast-in {
@@ -328,7 +345,7 @@ body {
 }
 
 .toast-in {
-  animation: toast-in 0.24s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation: toast-in 0.26s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
 .no-scrollbar {
@@ -343,6 +360,16 @@ body {
   text-wrap: balance;
 }
 
+/* browsers without backdrop-filter get a more opaque fill so text stays readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel,
+  .glass,
+  .panel-flat,
+  .glass-soft {
+    background: color-mix(in srgb, var(--panel-solid) 92%, transparent);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -351,8 +378,5 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
-  }
-  .scanline::after {
-    display: none;
   }
 }

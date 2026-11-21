@@ -11,7 +11,7 @@ type Props = {
 
 export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
   return (
-    <article className="group flex flex-col border border-line bg-[color-mix(in_srgb,var(--panel-solid)_60%,transparent)] transition-colors hover:border-[var(--accent-line)]">
+    <article className="rounded-2xl group flex flex-col border border-line bg-[var(--glass-soft)] transition-colors hover:border-[var(--accent-line)]">
       <button
         type="button"
         onClick={() => onWatch(video)}
@@ -30,7 +30,7 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (
-          <span className="grid h-full w-full place-items-center text-[0.6rem] text-faint">
+          <span className="grid h-full w-full place-items-center text-[0.72rem] text-faint">
             no preview
           </span>
         )}
@@ -40,20 +40,20 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
           style={{ background: "color-mix(in srgb, var(--bg-deep) 45%, transparent)" }}
         >
           <span
-            className="grid h-11 w-11 place-items-center border text-sm"
+            className="rounded-full grid h-11 w-11 place-items-center border text-sm"
             style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
           >
             ▶
           </span>
         </span>
         {video.durationLabel ? (
-          <span className="absolute right-1.5 bottom-1.5 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_82%,transparent)] px-1.5 py-0.5 text-[0.58rem] tabular-nums">
+          <span className="rounded-full absolute right-1.5 bottom-1.5 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_82%,transparent)] px-1.5 py-0.5 text-[0.72rem] tabular-nums">
             {video.durationLabel}
           </span>
         ) : null}
         {video.playback.type === "hls" ? (
           <span
-            className="absolute top-1.5 left-1.5 border px-1.5 py-0.5 text-[0.5rem] tracking-[0.18em] uppercase"
+            className="rounded-full absolute top-1.5 left-1.5 border px-1.5 py-0.5 text-[0.72rem]"
             style={{ borderColor: "var(--violet)", color: "var(--violet)" }}
           >
             hls
@@ -62,10 +62,10 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
       </button>
 
       <div className="flex flex-1 flex-col p-2.5">
-        <h3 className="line-clamp-2 text-[0.78rem] leading-snug font-bold">
+        <h3 className="line-clamp-2 text-[0.8rem] leading-snug font-bold">
           {video.title}
         </h3>
-        <p className="t-label mt-1.5 text-[0.5rem] normal-case">
+        <p className="t-label mt-1.5 text-[0.72rem]">
           {[video.author?.name, video.viewsLabel ? `${video.viewsLabel} views` : null]
             .filter(Boolean)
             .join(" · ")}
@@ -75,14 +75,14 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
           <button
             type="button"
             onClick={() => onWatch(video)}
-            className="btn h-10 min-h-[44px] flex-1 px-2 text-[0.58rem]"
+            className="btn h-10 min-h-[44px] flex-1 px-2 text-[0.72rem]"
           >
             <span aria-hidden>▶</span> Watch
           </button>
           <button
             type="button"
             onClick={() => onDownload(video)}
-            className="btn h-10 min-h-[44px] px-2.5 text-[0.58rem]"
+            className="btn h-10 min-h-[44px] px-2.5 text-[0.72rem]"
             aria-label={`Download ${video.title}`}
           >
             <span aria-hidden>⤓</span>
@@ -91,7 +91,7 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
           <button
             type="button"
             onClick={() => onShare(video)}
-            className="btn h-10 min-h-[44px] px-2.5 text-[0.58rem]"
+            className="btn h-10 min-h-[44px] px-2.5 text-[0.72rem]"
             aria-label={`Share ${video.title}`}
           >
             <span aria-hidden>↗</span>
@@ -105,7 +105,7 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
 
 export function VideoCardSkeleton() {
   return (
-    <div className="border border-line bg-[color-mix(in_srgb,var(--panel-solid)_45%,transparent)]">
+    <div className="rounded-2xl border border-line bg-[var(--glass-soft)]">
       <div className="skeleton aspect-video w-full" />
       <div className="space-y-2 p-2.5">
         <div className="skeleton h-3 w-full" />

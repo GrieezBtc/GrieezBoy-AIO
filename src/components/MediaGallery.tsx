@@ -81,12 +81,12 @@ function MediaCard({
   }
 
   return (
-    <article className="overflow-hidden border border-line bg-[color-mix(in_srgb,var(--panel-solid)_80%,transparent)]">
+    <article className="rounded-2xl overflow-hidden border border-line bg-[var(--glass-soft)]">
       <div className="relative aspect-video overflow-hidden bg-[var(--bg-deep)]">
         <MediaVisual item={item} />
 
         <div
-          className="absolute left-2 top-2 border px-2 py-1 text-[0.52rem] font-bold tracking-[0.16em] uppercase"
+          className="rounded-full absolute left-2 top-2 border px-2 py-1 text-[0.72rem] font-bold"
           style={{
             borderColor: "var(--accent-line)",
             background:
@@ -97,7 +97,7 @@ function MediaCard({
           {item.kind}
         </div>
 
-        <div className="absolute bottom-2 right-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_88%,transparent)] px-2 py-1 text-[0.52rem] font-bold tracking-[0.12em] uppercase">
+        <div className="rounded-full absolute bottom-2 right-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_88%,transparent)] px-2 py-1 text-[0.72rem] font-bold">
           {item.id.replace("media-", "#")}
         </div>
       </div>
@@ -105,13 +105,13 @@ function MediaCard({
       <div className="space-y-3 p-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="t-label text-[0.5rem]">media item</p>
-            <p className="mt-1 truncate text-[0.72rem] font-semibold">
+            <p className="t-label text-[0.72rem]">media item</p>
+            <p className="mt-1 truncate text-[0.8rem] font-semibold">
               {item.label ?? optionLabel(primary)}
             </p>
           </div>
 
-          <span className="shrink-0 text-[0.58rem] text-dim">
+          <span className="shrink-0 text-[0.72rem] text-dim">
             {item.options.length} option
             {item.options.length === 1 ? "" : "s"}
           </span>
@@ -121,14 +121,14 @@ function MediaCard({
           type="button"
           onClick={() => primary && download(primary)}
           disabled={!primary || downloading}
-          className="btn btn-primary min-h-[42px] w-full text-[0.62rem] disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary min-h-[42px] w-full text-[0.72rem] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {downloading ? "Preparing..." : "Download this media"}
         </button>
 
         {item.options.length > 1 && (
           <div className="space-y-1.5 border-t border-line pt-2">
-            <p className="t-label text-[0.48rem]">available versions</p>
+            <p className="t-label text-[0.72rem]">available versions</p>
 
             <div className="grid gap-1.5 sm:grid-cols-2">
               {item.options.map((option) => (
@@ -137,7 +137,7 @@ function MediaCard({
                   type="button"
                   onClick={() => download(option)}
                   disabled={downloading}
-                  className="border border-line px-2.5 py-2 text-left text-[0.58rem] transition hover:border-[var(--accent-line)] hover:text-[var(--accent)] disabled:opacity-60"
+                  className="rounded-full border border-line px-2.5 py-2 text-left text-[0.72rem] transition hover:border-[var(--accent-line)] hover:text-[var(--accent)] disabled:opacity-60"
                 >
                   <span className="block font-semibold">
                     {optionLabel(option)}
@@ -180,7 +180,7 @@ export function MediaGallery({
           </h2>
         </div>
 
-        <span className="text-[0.58rem] text-dim">
+        <span className="text-[0.72rem] text-dim">
           Select an item to download it individually
         </span>
       </div>

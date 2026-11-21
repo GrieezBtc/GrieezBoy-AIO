@@ -32,7 +32,7 @@ export function MediaPreview({ result }: { result: NormalizedDownloadResult }) {
 
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,300px)_1fr] lg:grid-cols-[minmax(0,360px)_1fr]">
-      <figure className="relative m-0 overflow-hidden border border-line bg-[color-mix(in_srgb,var(--bg-deep)_80%,transparent)]">
+      <figure className="rounded-2xl relative m-0 overflow-hidden border border-line bg-[color-mix(in_srgb,var(--bg-deep)_80%,transparent)]">
         {media.thumbnailUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -48,7 +48,7 @@ export function MediaPreview({ result }: { result: NormalizedDownloadResult }) {
           </div>
         )}
         <figcaption
-          className="absolute top-2 left-2 border px-2 py-1 text-[0.58rem] font-bold tracking-[0.18em] uppercase backdrop-blur-md"
+          className="rounded-full absolute top-2 left-2 border px-2 py-1 text-[0.72rem] font-bold backdrop-blur-md"
           style={{
             borderColor: platform.accent,
             color: platform.accent,
@@ -58,7 +58,7 @@ export function MediaPreview({ result }: { result: NormalizedDownloadResult }) {
           {platform.short} · {KIND_LABEL[media.kind]}
         </figcaption>
         {media.durationLabel ? (
-          <span className="absolute right-2 bottom-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_82%,transparent)] px-2 py-1 text-[0.62rem] tabular-nums">
+          <span className="rounded-full absolute right-2 bottom-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_82%,transparent)] px-2 py-1 text-[0.72rem] tabular-nums">
             {media.durationLabel}
           </span>
         ) : null}
@@ -78,10 +78,10 @@ export function MediaPreview({ result }: { result: NormalizedDownloadResult }) {
                 alt=""
                 loading="lazy"
                 decoding="async"
-                className="h-7 w-7 shrink-0 border border-line object-cover"
+                className="rounded-lg h-7 w-7 shrink-0 border border-line object-cover"
               />
             ) : null}
-            <p className="min-w-0 truncate text-[0.78rem] text-dim">
+            <p className="min-w-0 truncate text-[0.8rem] text-dim">
               {media.author.name ?? media.author.username}
               {media.author.username && media.author.name ? (
                 <span className="text-faint"> · @{media.author.username.replace(/^@/, "")}</span>
@@ -91,19 +91,19 @@ export function MediaPreview({ result }: { result: NormalizedDownloadResult }) {
         ) : null}
 
         {media.description ? (
-          <p className="mt-3 line-clamp-3 max-w-2xl text-[0.76rem] leading-relaxed text-dim">
+          <p className="mt-3 line-clamp-3 max-w-2xl text-[0.8rem] leading-relaxed text-dim">
             {media.description}
           </p>
         ) : null}
 
-        <dl className="mt-4 grid grid-cols-2 gap-px border border-line bg-[var(--line)] sm:grid-cols-3">
+        <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-[var(--line)] backdrop-blur-md sm:grid-cols-3">
           {facts.map((fact) => (
             <div
               key={fact.label}
-              className="bg-[color-mix(in_srgb,var(--panel-solid)_80%,transparent)] px-2.5 py-2"
+              className="bg-[var(--glass-soft)] px-2.5 py-2"
             >
-              <dt className="t-label text-[0.5rem]">{fact.label}</dt>
-              <dd className="mt-1 truncate text-[0.74rem] font-medium">{fact.value}</dd>
+              <dt className="t-label text-[0.72rem]">{fact.label}</dt>
+              <dd className="mt-1 truncate text-[0.8rem] font-medium">{fact.value}</dd>
             </div>
           ))}
         </dl>

@@ -38,18 +38,18 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
     <section aria-labelledby="platform-selector-label" className="w-full">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h2 id="platform-selector-label" className="t-label">
-          Source matrix
+          Choose a source
         </h2>
-        <p className="t-label normal-case" aria-live="polite">
+        <p className="t-label" aria-live="polite">
           {detected ? (
             <>
-              <span className="text-faint">platform detected: </span>
-              <span className="font-bold tracking-[0.18em] text-accent uppercase">
+              <span className="text-faint">Detected: </span>
+              <span className="font-bold text-accent">
                 {PLATFORMS.find((p) => p.id === detected)?.label}
               </span>
             </>
           ) : (
-            <span className="text-faint">awaiting url…</span>
+            <span className="text-faint">Waiting for a link…</span>
           )}
         </p>
       </div>
@@ -71,7 +71,7 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
               aria-checked={isSelected}
               disabled={disabled}
               onClick={() => onSelect(item.id)}
-              className="group relative flex min-h-[64px] w-[116px] shrink-0 snap-start flex-col items-start justify-between gap-1 border px-3 py-2.5 text-left transition-all duration-150 disabled:opacity-50 sm:w-auto"
+              className="rounded-2xl group relative flex min-h-[64px] w-[116px] shrink-0 snap-start flex-col items-start justify-between gap-1 border px-3 py-2.5 text-left transition-all duration-150 disabled:opacity-50 sm:w-auto"
               style={{
                 borderColor: highlight ? item.accent : "var(--line)",
                 background: highlight
@@ -82,7 +82,7 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
             >
               <span className="flex w-full items-center justify-between gap-1">
                 <span
-                  className="text-[0.62rem] font-bold tracking-[0.18em]"
+                  className="text-[0.72rem] font-bold"
                   style={{ color: highlight ? item.accent : "var(--text-dim)" }}
                 >
                   {item.short}
@@ -95,10 +95,10 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
                   />
                 ) : null}
               </span>
-              <span className="text-[0.68rem] leading-tight font-medium">
+              <span className="text-[0.72rem] leading-tight font-medium">
                 {item.label}
               </span>
-              <span className="t-label text-[0.5rem] normal-case">{item.hint}</span>
+              <span className="t-label text-[0.72rem]">{item.hint}</span>
               {isDetected ? <span className="sr-only">detected from URL</span> : null}
             </button>
           );

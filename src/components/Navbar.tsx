@@ -32,12 +32,12 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="btn btn-ghost h-10 min-h-[40px] px-3 text-[0.65rem]"
+      className="btn btn-ghost h-10 min-h-[40px] px-3 text-[0.72rem]"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
       title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
     >
       <span aria-hidden>{theme === "dark" ? "◑" : "◐"}</span>
-      <span className="hidden lg:inline">{theme === "dark" ? "DARK" : "LIGHT"}</span>
+      <span className="hidden lg:inline">{theme === "dark" ? "Dark" : "Light"}</span>
     </button>
   );
 }
@@ -91,7 +91,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-line bg-[color-mix(in_srgb,var(--bg)_86%,transparent)] backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-line bg-[var(--panel)] shadow-[var(--glass-edge)] backdrop-blur-2xl backdrop-saturate-150">
         <div className="mx-auto flex h-14 w-full max-w-[1400px] items-center justify-between gap-3 px-3 sm:h-16 sm:px-5 lg:px-8">
           <Wordmark />
 
@@ -104,7 +104,7 @@ export function Navbar() {
                     <Link
                       href={item.href}
                       aria-current={active ? "page" : undefined}
-                      className="relative flex h-10 items-center gap-2 border border-transparent px-3 text-[0.7rem] tracking-[0.16em] uppercase transition-colors"
+                      className="rounded-full relative flex h-10 items-center gap-2 border border-transparent px-4 text-[0.82rem] font-medium transition-colors"
                       style={
                         active
                           ? {
@@ -115,7 +115,7 @@ export function Navbar() {
                           : { color: "var(--text-dim)" }
                       }
                     >
-                      <span aria-hidden className="text-[0.7rem] opacity-70">
+                      <span aria-hidden className="text-[0.8rem] opacity-70">
                         {item.glyph}
                       </span>
                       {item.label}
@@ -131,10 +131,10 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={onInstallOrShare}
-                className="btn btn-ghost hidden h-10 min-h-[40px] px-3 text-[0.65rem] sm:inline-flex"
+                className="btn btn-ghost hidden h-10 min-h-[40px] px-3 text-[0.72rem] sm:inline-flex"
               >
                 <span aria-hidden>{installEvent ? "⤓" : "↗"}</span>
-                {installEvent ? "INSTALL" : "SHARE"}
+                {installEvent ? "Install" : "Share"}
               </button>
             ) : null}
             <ThemeToggle />
@@ -145,7 +145,7 @@ export function Navbar() {
       {/* mobile bottom navigation */}
       <nav
         aria-label="Primary mobile"
-        className="fixed inset-x-0 bottom-0 z-[100] w-full border-t border-line bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-[100] w-full rounded-t-3xl border-t border-line bg-[var(--panel)] shadow-[var(--glass-edge)] pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-150 md:hidden"
       >
         <ul className="mx-auto grid w-full max-w-lg grid-cols-4">
           {NAV.map((item) => {
@@ -155,7 +155,7 @@ export function Navbar() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className="flex min-h-[54px] flex-col items-center justify-center gap-1 px-1 py-2 text-[0.58rem] tracking-[0.12em] uppercase transition-colors"
+                  className="flex min-h-[54px] flex-col items-center justify-center gap-1 px-1 py-2 text-[0.72rem] font-medium transition-colors"
                   style={{ color: active ? "var(--accent)" : "var(--text-faint)" }}
                 >
                   <span aria-hidden className="text-sm leading-none">
@@ -164,7 +164,7 @@ export function Navbar() {
                   {item.label}
                   <span
                     aria-hidden
-                    className="h-px w-5"
+                    className="h-0.5 w-5 rounded-full"
                     style={{ background: active ? "var(--accent)" : "transparent" }}
                   />
                 </Link>

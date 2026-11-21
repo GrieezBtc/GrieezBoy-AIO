@@ -13,7 +13,7 @@ export default function VideoHubPage() {
       <header className="mb-6">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className="border px-2 py-1 text-[0.55rem] font-bold tracking-[0.22em] uppercase"
+            className="rounded-full border px-2 py-1 text-[0.72rem] font-bold"
             style={{ borderColor: "var(--violet)", color: "var(--violet)" }}
           >
             module 02

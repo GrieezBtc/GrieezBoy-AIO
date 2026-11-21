@@ -4,7 +4,7 @@ export function LogoGlyph({ size = 34 }: { size?: number }) {
   return (
     <span
       aria-hidden
-      className="relative grid shrink-0 place-items-center border"
+      className="rounded-2xl relative grid shrink-0 place-items-center border"
       style={{
         width: size,
         height: size,
@@ -23,7 +23,7 @@ export function LogoGlyph({ size = 34 }: { size?: number }) {
         <path d="M12 8v8m0 0 3.2-3.2M12 16l-3.2-3.2" stroke="var(--accent)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
       <span
-        className="absolute -right-px -bottom-px h-1.5 w-1.5"
+        className="absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full"
         style={{ background: "var(--accent)" }}
       />
     </span>
@@ -52,7 +52,7 @@ export function Wordmark({
           <span className="ml-1 text-accent">AIO</span>
         </span>
         {!compact ? (
-          <span className="t-label mt-1 hidden text-[0.55rem] sm:block">
+          <span className="t-label mt-1 hidden text-[0.72rem] sm:block">
             multi-source media engine
           </span>
         ) : null}

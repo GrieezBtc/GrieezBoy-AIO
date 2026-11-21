@@ -44,9 +44,9 @@ export function HistoryView() {
   if (!entries.length) {
     return (
       <div className="panel-flat grid place-items-center gap-2 px-4 py-14 text-center">
-        <p className="t-label">log empty</p>
+        <p className="t-label">Nothing here yet</p>
         <p className="max-w-md text-[0.8rem] text-dim">
-          Executed links appear here. Everything is stored in this browser only —
+          Links you download appear here. Everything is stored in this browser only —
           nothing is uploaded.
         </p>
       </div>
@@ -63,9 +63,9 @@ export function HistoryView() {
           type="button"
           onClick={() => {
             clearHistory();
-            push({ title: "History cleared", body: "Local activity log wiped.", tone: "ok" });
+            push({ title: "History cleared", body: "Local activity cleared.", tone: "ok" });
           }}
-          className="btn px-4 text-[0.62rem]"
+          className="btn px-4 text-[0.72rem]"
         >
           <span aria-hidden>⌫</span> Clear history
         </button>
@@ -77,7 +77,7 @@ export function HistoryView() {
           return (
             <li
               key={entry.id}
-              className="flex min-w-0 w-full flex-col gap-3 overflow-hidden border border-line bg-[color-mix(in_srgb,var(--panel-solid)_58%,transparent)] p-2.5 sm:flex-row sm:items-center"
+              className="rounded-2xl flex min-w-0 w-full flex-col gap-3 overflow-hidden border border-line bg-[var(--glass-soft)] p-2.5 sm:flex-row sm:items-center"
             >
               {entry.thumbnailUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -86,10 +86,10 @@ export function HistoryView() {
                   alt=""
                   loading="lazy"
                   decoding="async"
-                  className="h-24 w-full max-w-full shrink-0 border border-line object-cover sm:h-14 sm:w-24"
+                  className="rounded-lg h-24 w-full max-w-full shrink-0 border border-line object-cover sm:h-14 sm:w-24"
                 />
               ) : (
-                <span className="grid h-14 w-full shrink-0 place-items-center border border-line text-[0.6rem] text-faint sm:w-24">
+                <span className="rounded-lg grid h-14 w-full shrink-0 place-items-center border border-line text-[0.72rem] text-faint sm:w-24">
                   {platform?.short ?? "—"}
                 </span>
               )}
@@ -98,8 +98,8 @@ export function HistoryView() {
                 <p className="truncate text-[0.8rem] font-bold">
                   {entry.title ?? entry.url}
                 </p>
-                <p className="mt-1 truncate text-[0.66rem] text-faint">{entry.url}</p>
-                <p className="t-label mt-1 flex flex-wrap gap-x-2 text-[0.5rem] normal-case">
+                <p className="mt-1 truncate text-[0.72rem] text-faint">{entry.url}</p>
+                <p className="t-label mt-1 flex flex-wrap gap-x-2 text-[0.72rem]">
                   <span style={{ color: platform?.accent }}>{entry.platformLabel}</span>
                   <span>· {relativeTime(entry.timestamp)}</span>
                   <span
@@ -116,14 +116,14 @@ export function HistoryView() {
                 <button
                   type="button"
                   onClick={() => router.push(`/?url=${encodeURIComponent(entry.url)}`)}
-                  className="btn min-w-0 px-3 text-[0.6rem] sm:flex-none"
+                  className="btn min-w-0 px-3 text-[0.72rem] sm:flex-none"
                 >
                   <span aria-hidden>↻</span> Retry
                 </button>
                 <button
                   type="button"
                   onClick={() => removeHistory(entry.id)}
-                  className="btn btn-ghost px-3 text-[0.6rem]"
+                  className="btn btn-ghost px-3 text-[0.72rem]"
                   aria-label={`Remove ${entry.title ?? entry.url} from history`}
                 >
                   <span aria-hidden>✕</span>

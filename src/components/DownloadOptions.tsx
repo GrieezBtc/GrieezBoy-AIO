@@ -14,7 +14,7 @@ const GROUPS: Array<{ type: DownloadOption["type"]; label: string; glyph: string
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="border border-line px-1.5 py-0.5 text-[0.55rem] tracking-[0.12em] text-faint uppercase">
+    <span className="rounded-full border border-line px-1.5 py-0.5 text-[0.72rem] text-faint">
       {children}
     </span>
   );
@@ -50,11 +50,11 @@ function OptionRow({
 
   return (
     <li
-      className="reveal grid gap-2 border border-line bg-[color-mix(in_srgb,var(--panel-solid)_62%,transparent)] p-2.5 transition-colors hover:border-[var(--line-strong)] sm:grid-cols-[1fr_auto] sm:items-center"
+      className="rounded-2xl reveal grid gap-2 border border-line bg-[var(--glass-soft)] p-2.5 transition-colors hover:border-[var(--line-strong)] sm:grid-cols-[1fr_auto] sm:items-center"
       style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
     >
       <div className="min-w-0">
-        <p className="flex items-center gap-2 text-[0.78rem] font-bold tracking-[0.06em]">
+        <p className="flex items-center gap-2 text-[0.8rem] font-bold">
           <span aria-hidden className="text-accent">
             {option.type === "audio" ? "♪" : option.type === "image" ? "▣" : "▶"}
           </span>
@@ -72,7 +72,7 @@ function OptionRow({
           {option.fileSizeLabel ? <Badge>{option.fileSizeLabel}</Badge> : null}
           {option.expiresAt ? (
             <span
-              className="border px-1.5 py-0.5 text-[0.55rem] tracking-[0.12em] uppercase"
+              className="rounded-full border px-1.5 py-0.5 text-[0.72rem]"
               style={{
                 borderColor: expiresSoon ? "var(--amber)" : "var(--line)",
                 color: expiresSoon ? "var(--amber)" : "var(--text-faint)",
@@ -88,7 +88,7 @@ function OptionRow({
         <button
           type="button"
           onClick={copy}
-          className="btn btn-ghost h-10 min-h-[44px] px-3 text-[0.62rem]"
+          className="btn btn-ghost h-10 min-h-[44px] px-3 text-[0.72rem]"
           aria-label={`Copy direct link for ${option.label}`}
         >
           <span aria-hidden>{copied ? "✓" : "⧉"}</span>
@@ -103,7 +103,7 @@ function OptionRow({
               source: { url: option.url, expectedBytes: option.fileSize },
             })
           }
-          className="btn btn-primary h-10 min-h-[44px] flex-1 px-4 text-[0.62rem] sm:flex-none"
+          className="btn btn-primary h-10 min-h-[44px] flex-1 px-4 text-[0.72rem] sm:flex-none"
         >
           <span aria-hidden>⤓</span> Download
         </button>

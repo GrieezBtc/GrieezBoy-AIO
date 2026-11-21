@@ -12,7 +12,7 @@ export function StagePipeline({ stage }: { stage: Stage }) {
   const activeIndex = STEPS.findIndex((step) => step.id === stage);
   return (
     <ol
-      className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.6rem] tracking-[0.18em] uppercase"
+      className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.72rem]"
       aria-label="Processing pipeline"
     >
       {STEPS.map((step, index) => {
@@ -29,7 +29,7 @@ export function StagePipeline({ stage }: { stage: Stage }) {
               style={{ color }}
               className={active ? "live-dot font-bold" : done ? "font-bold" : ""}
             >
-              {done ? "✓" : active ? "▮" : "·"} {step.label}
+              {done ? "✓" : active ? "●" : "○"} {step.label}
             </span>
             {index < STEPS.length - 1 ? (
               <span aria-hidden className="text-faint">
@@ -48,11 +48,11 @@ export function LoadingState({ stage }: { stage: Stage }) {
     <section
       aria-busy="true"
       aria-live="polite"
-      className="panel scanline reveal relative overflow-hidden p-4 sm:p-5"
+      className="panel reveal relative overflow-hidden p-4 sm:p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <StagePipeline stage={stage} />
-        <span className="t-label text-[0.55rem]">
+        <span className="t-label text-[0.72rem]">
           {stage === "analyzing" ? "resolving source" : "extracting streams"}
         </span>
       </div>

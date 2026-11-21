@@ -80,7 +80,7 @@ export function ContactForm() {
             name="platform"
             required
             defaultValue=""
-            className="min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 text-[0.78rem] text-ink outline-none transition-colors focus:border-[var(--accent-line)]"
+            className="rounded-xl min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 text-[0.8rem] text-ink outline-none transition-colors focus:border-[var(--accent-line)]"
           >
             <option value="" disabled>
               Select platform
@@ -100,7 +100,7 @@ export function ContactForm() {
             type="url"
             maxLength={2048}
             placeholder="https://..."
-            className="min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 text-[0.78rem] text-ink outline-none placeholder:text-faint focus:border-[var(--accent-line)]"
+            className="rounded-xl min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 text-[0.8rem] text-ink outline-none placeholder:text-faint focus:border-[var(--accent-line)]"
           />
         </label>
       </div>
@@ -114,7 +114,7 @@ export function ContactForm() {
           maxLength={4000}
           rows={6}
           placeholder="Describe what you expected, what happened, and any error message you saw."
-          className="w-full resize-y border border-line bg-[var(--panel-solid)] px-3 py-3 text-[0.78rem] leading-relaxed text-ink outline-none placeholder:text-faint focus:border-[var(--accent-line)]"
+          className="rounded-xl w-full resize-y border border-line bg-[var(--panel-solid)] px-3 py-3 text-[0.8rem] leading-relaxed text-ink outline-none placeholder:text-faint focus:border-[var(--accent-line)]"
         />
       </label>
 
@@ -125,9 +125,9 @@ export function ContactForm() {
             name="screenshot"
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            className="min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 py-2 text-[0.72rem] text-dim file:mr-3 file:border-0 file:bg-transparent file:text-[0.72rem] file:font-semibold file:text-ink"
+            className="rounded-xl min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 py-2 text-[0.8rem] text-dim file:mr-3 file:border-0 file:bg-transparent file:text-[0.8rem] file:font-semibold file:text-ink"
           />
-          <span className="text-[0.65rem] text-faint">
+          <span className="text-[0.72rem] text-faint">
             JPG, PNG or WebP · max 5 MB
           </span>
         </label>
@@ -139,9 +139,9 @@ export function ContactForm() {
             type="text"
             maxLength={200}
             placeholder="Telegram, WhatsApp or email"
-            className="min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 text-[0.78rem] text-ink outline-none placeholder:text-faint focus:border-[var(--accent-line)]"
+            className="rounded-xl min-h-11 w-full border border-line bg-[var(--panel-solid)] px-3 text-[0.8rem] text-ink outline-none placeholder:text-faint focus:border-[var(--accent-line)]"
           />
-          <span className="text-[0.65rem] text-faint">
+          <span className="text-[0.72rem] text-faint">
             Only provide this if you want a reply.
           </span>
         </label>
@@ -150,7 +150,7 @@ export function ContactForm() {
       {result ? (
         <div
           role="status"
-          className={`border px-3 py-3 text-[0.72rem] leading-relaxed ${
+          className={`border px-3 py-3 text-[0.8rem] leading-relaxed ${
             result.type === "success"
               ? "border-[var(--accent-line)] text-accent"
               : "border-[color-mix(in_srgb,var(--danger)_45%,transparent)] text-[var(--danger)]"
@@ -161,7 +161,7 @@ export function ContactForm() {
       ) : null}
 
       <div className="flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="max-w-lg text-[0.65rem] leading-relaxed text-faint">
+        <p className="max-w-lg text-[0.72rem] leading-relaxed text-faint">
           Reports are sent privately to customer care. Uploaded screenshots
           are forwarded with the report and are not stored by GRIEEZBOY AIO.
         </p>

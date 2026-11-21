@@ -41,14 +41,14 @@ export default function AboutPage() {
         </p>
       </header>
 
-      <div className="grid gap-px border border-line bg-[var(--line)] sm:grid-cols-2">
+      <div className="grid gap-px overflow-hidden rounded-2xl border border-line bg-[var(--line)] backdrop-blur-md sm:grid-cols-2">
         {SECTIONS.map((section) => (
           <section
             key={section.title}
-            className="bg-[color-mix(in_srgb,var(--panel-solid)_72%,transparent)] p-4"
+            className="bg-[var(--glass-soft)] p-4"
           >
             <h2 className="text-[0.9rem] font-bold tracking-tight">{section.title}</h2>
-            <p className="mt-2 text-[0.76rem] leading-relaxed text-dim">{section.body}</p>
+            <p className="mt-2 text-[0.8rem] leading-relaxed text-dim">{section.body}</p>
           </section>
         ))}
       </div>
@@ -56,14 +56,14 @@ export default function AboutPage() {
         <h2 className="t-label">Supported sources</h2>
         <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {PLATFORMS.map((platform) => (
-            <li key={platform.id} className="border border-line px-3 py-2">
+            <li key={platform.id} className="rounded-full border border-line px-3 py-2">
               <span
-                className="text-[0.58rem] font-bold tracking-[0.2em]"
+                className="text-[0.72rem] font-bold"
                 style={{ color: platform.accent }}
               >
                 {platform.short}
               </span>
-              <p className="mt-1 text-[0.74rem]">{platform.label}</p>
+              <p className="mt-1 text-[0.8rem]">{platform.label}</p>
             </li>
           ))}
         </ul>

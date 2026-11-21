@@ -42,7 +42,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       /* storage unavailable */
     }
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", next === "light" ? "#f2f3f5" : "#07080a");
+    if (meta) meta.setAttribute("content", next === "light" ? "#e9edfb" : "#0a0d1c");
   }, []);
 
   const value = useMemo<ThemeContextValue>(

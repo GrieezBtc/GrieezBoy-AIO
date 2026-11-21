@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "GRIEEZBOY AIO — Multi-Source Media Engine",
-    description: "ONE ENGINE → 8 PLATFORMS → PASTE URL → EXECUTE → DOWNLOAD",
+    description: "One engine, eight platforms. Paste a link and download every available format.",
     type: "website",
   },
   robots: { index: true, follow: true },
@@ -44,7 +44,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#07080a",
+  themeColor: "#0a0d1c",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         />
       </head>
       <body className="antialiased">
@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <DownloadProvider>
             <a
               href="#main"
-              className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:border focus:border-[var(--accent)] focus:bg-[var(--panel-solid)] focus:px-3 focus:py-2 focus:text-xs"
+              className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-full focus:border focus:border-[var(--accent)] focus:bg-[var(--panel-solid)] focus:px-4 focus:py-2 focus:text-xs"
             >
               Skip to content
             </a>

@@ -16,7 +16,7 @@ export default function ContactPage() {
           <h1 className="mt-2 text-[clamp(1.6rem,1.2rem+2.4vw,2.6rem)] leading-none font-bold tracking-[-0.05em]">
             REPORT AN ISSUE
           </h1>
-          <p className="mt-3 max-w-2xl text-[0.78rem] leading-relaxed text-dim">
+          <p className="mt-3 max-w-2xl text-[0.8rem] leading-relaxed text-dim">
             Something failed, returned the wrong result or behaved
             unexpectedly? Send the details below. Your report goes directly
             to the GRIEEZBOY AIO support channel.

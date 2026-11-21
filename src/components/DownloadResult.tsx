@@ -21,7 +21,7 @@ export function DownloadResult({
         <StagePipeline stage="ready" />
         <div className="flex items-center gap-2">
           <span
-            className="border px-2 py-1 text-[0.58rem] font-bold tracking-[0.18em] uppercase"
+            className="rounded-full border px-2 py-1 text-[0.72rem] font-bold"
             style={{ borderColor: "var(--accent-line)", color: "var(--accent)" }}
           >
             status: ready
@@ -29,7 +29,7 @@ export function DownloadResult({
           <button
             type="button"
             onClick={onReset}
-            className="btn btn-ghost h-9 min-h-[40px] px-3 text-[0.6rem]"
+            className="btn btn-ghost h-9 min-h-[40px] px-3 text-[0.72rem]"
           >
             New query
           </button>
@@ -40,9 +40,9 @@ export function DownloadResult({
         <MediaPreview result={result} />
         <MediaGallery items={result.items} title={result.media.title} />
 
-        <details className="border border-line bg-[color-mix(in_srgb,var(--panel-solid)_50%,transparent)]">
+        <details className="rounded-2xl border border-line bg-[var(--glass-soft)]">
           <summary className="t-label cursor-pointer list-none px-3 py-2.5 select-none">
-            ▸ Technical metadata
+            Technical metadata
           </summary>
           <dl className="grid gap-px border-t border-line bg-[var(--line)] sm:grid-cols-2">
             {[
@@ -58,10 +58,10 @@ export function DownloadResult({
             ].map(([label, value]) => (
               <div
                 key={label}
-                className="bg-[color-mix(in_srgb,var(--panel-solid)_80%,transparent)] px-3 py-2"
+                className="bg-[var(--glass-soft)] px-3 py-2"
               >
-                <dt className="t-label text-[0.5rem]">{label}</dt>
-                <dd className="mt-1 truncate text-[0.7rem] text-dim">{value}</dd>
+                <dt className="t-label text-[0.72rem]">{label}</dt>
+                <dd className="mt-1 truncate text-[0.8rem] text-dim">{value}</dd>
               </div>
             ))}
           </dl>

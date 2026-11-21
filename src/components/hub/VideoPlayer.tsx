@@ -96,7 +96,7 @@ export function VideoPlayer({
           <button
             type="button"
             onClick={onClose}
-            className="btn btn-ghost h-9 min-h-[40px] px-3 text-[0.62rem]"
+            className="btn btn-ghost h-9 min-h-[40px] px-3 text-[0.72rem]"
           >
             <span aria-hidden>✕</span> Close
           </button>
@@ -117,7 +117,7 @@ export function VideoPlayer({
                 className="text-[0.8rem]"
                 style={{ color: "var(--danger)" }}
               >
-                [!] YouTube video could not be opened.
+                YouTube video could not be opened.
               </p>
             </div>
           )}
@@ -128,7 +128,7 @@ export function VideoPlayer({
             {video.title}
           </h2>
 
-          <div className="t-label flex flex-wrap gap-x-3 gap-y-1 normal-case">
+          <div className="t-label flex flex-wrap gap-x-3 gap-y-1">
             {video.author?.name ? (
               <span>{video.author.name}</span>
             ) : null}
@@ -145,7 +145,7 @@ export function VideoPlayer({
           </div>
 
           {video.description ? (
-            <p className="text-[0.75rem] leading-relaxed text-dim">
+            <p className="text-[0.8rem] leading-relaxed text-dim">
               {video.description}
             </p>
           ) : null}
@@ -154,7 +154,7 @@ export function VideoPlayer({
             <button
               type="button"
               onClick={onDownload}
-              className="btn btn-primary px-4 text-[0.62rem]"
+              className="btn btn-primary px-4 text-[0.72rem]"
             >
               <span aria-hidden>⤓</span> Download
             </button>
@@ -162,7 +162,7 @@ export function VideoPlayer({
             <button
               type="button"
               onClick={() => onShare(video)}
-              className="btn px-4 text-[0.62rem]"
+              className="btn px-4 text-[0.72rem]"
             >
               <span aria-hidden>↗</span> Share
             </button>

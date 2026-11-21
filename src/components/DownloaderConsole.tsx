@@ -18,7 +18,7 @@ import type {
   SupportedPlatform,
 } from "@/services/aioDownloader/types";
 
-const STATUS_IDLE = "engine idle · awaiting target";
+const STATUS_IDLE = "Ready — paste a link to begin";
 
 export function DownloaderConsole() {
   const { push } = useToast();
@@ -61,7 +61,7 @@ export function DownloaderConsole() {
     if (stage === "processing") return "extracting available streams…";
     if (!trimmed) return STATUS_IDLE;
     if (detected) {
-      return `platform detected: ${PLATFORM_MAP[detected].label.toUpperCase()} · ready to execute`;
+      return `platform detected: ${PLATFORM_MAP[detected].label} · ready to download`;
     }
     return "parsing input…";
   }, [stage, trimmed, detected]);
@@ -154,7 +154,7 @@ export function DownloaderConsole() {
             status: "failed",
           });
           setRecent(readHistory().slice(0, 3));
-          push({ title: "Execution failed", body: payload.error.message, tone: "error" });
+          push({ title: "Download failed", body: payload.error.message, tone: "error" });
         }
       } catch (error) {
         window.clearTimeout(toProcessing);
@@ -271,7 +271,7 @@ export function DownloaderConsole() {
                       setUrl(entry.url);
                       void execute(entry.url, "auto");
                     }}
-                    className="flex min-h-[56px] w-full min-w-0 max-w-full items-center gap-2.5 overflow-hidden border border-line bg-[color-mix(in_srgb,var(--panel-solid)_55%,transparent)] p-2 text-left transition-colors hover:border-[var(--accent-line)]"
+                    className="rounded-2xl flex min-h-[56px] w-full min-w-0 max-w-full items-center gap-2.5 overflow-hidden border border-line bg-[var(--glass-soft)] p-2 text-left transition-colors hover:border-[var(--accent-line)]"
                   >
                     {entry.thumbnailUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
@@ -280,18 +280,18 @@ export function DownloaderConsole() {
                         alt=""
                         loading="lazy"
                         decoding="async"
-                        className="h-10 w-16 shrink-0 border border-line object-cover"
+                        className="rounded-lg h-10 w-16 shrink-0 border border-line object-cover"
                       />
                     ) : (
-                      <span className="grid h-10 w-16 shrink-0 place-items-center border border-line text-[0.55rem] text-faint">
+                      <span className="rounded-lg grid h-10 w-16 shrink-0 place-items-center border border-line text-[0.72rem] text-faint">
                         {PLATFORM_MAP[entry.platform].short}
                       </span>
                     )}
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[0.72rem]">
+                      <span className="block truncate text-[0.8rem]">
                         {entry.title ?? entry.url}
                       </span>
-                      <span className="t-label block text-[0.5rem]">
+                      <span className="t-label block text-[0.72rem]">
                         {entry.platformLabel} · {relativeTime(entry.timestamp)}
                       </span>
                     </span>

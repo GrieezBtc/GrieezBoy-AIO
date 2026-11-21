@@ -384,7 +384,7 @@ export function VideoHubView() {
           Search hub
         </label>
 
-        <div className="flex min-w-0 flex-1 items-center gap-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_65%,transparent)] px-2">
+        <div className="rounded-2xl flex min-w-0 flex-1 items-center gap-2 border border-line bg-[color-mix(in_srgb,var(--bg-deep)_65%,transparent)] px-2">
           <input
             id="hub-search"
             type="search"
@@ -415,7 +415,7 @@ export function VideoHubView() {
         </div>
 
         <p
-          className="t-label shrink-0 text-[0.55rem] normal-case"
+          className="t-label shrink-0 text-[0.72rem]"
           aria-live="polite"
         >
           {loading
@@ -431,7 +431,7 @@ export function VideoHubView() {
       {offline ? (
         <p
           role="status"
-          className="border px-3 py-2.5 text-[0.75rem]"
+          className="rounded-full border px-3 py-2.5 text-[0.8rem]"
           style={{
             borderColor: "var(--amber)",
             color: "var(--amber)",
@@ -452,16 +452,15 @@ export function VideoHubView() {
         >
           <div>
             <p
-              className="text-[0.78rem] font-bold tracking-[0.18em] uppercase"
+              className="text-[0.8rem] font-bold"
               style={{ color: "var(--danger)" }}
             >
-              [!]{" "}
               {mode === "feed"
                 ? "Feed unavailable"
                 : "Search unavailable"}
             </p>
 
-            <p className="mt-1.5 text-[0.76rem] text-dim">
+            <p className="mt-1.5 text-[0.8rem] text-dim">
               {error}
             </p>
           </div>

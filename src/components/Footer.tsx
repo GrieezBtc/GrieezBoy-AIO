@@ -10,7 +10,7 @@ const SOCIALS = [
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-line bg-[color-mix(in_srgb,var(--bg-deep)_70%,transparent)]">
+    <footer className="mt-16 border-t border-line bg-[var(--glass-soft)] backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[1400px] px-4 pt-8 pb-28 sm:px-6 md:pb-10 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -20,15 +20,15 @@ export function Footer() {
                 GRIEEZBOY <span className="text-accent">AIO</span>
               </span>
             </div>
-            <p className="mt-3 max-w-xs text-[0.72rem] leading-relaxed text-dim">
-              One engine, eight sources. Paste a link, execute, download. No
+            <p className="mt-3 max-w-xs text-[0.8rem] leading-relaxed text-dim">
+              One engine, eight sources. Paste a link, download. No
               accounts, no tracking, no clutter.
             </p>
           </div>
 
           <div>
             <h2 className="t-label">Modules</h2>
-            <ul className="mt-3 space-y-2 text-[0.75rem]">
+            <ul className="mt-3 space-y-2 text-[0.8rem]">
               <li>
                 <Link href="/" className="text-dim transition-colors hover:text-accent">
                   Downloader
@@ -58,7 +58,7 @@ export function Footer() {
               {PLATFORMS.map((platform) => (
                 <li
                   key={platform.id}
-                  className="border border-line px-2 py-1 text-[0.62rem] tracking-[0.1em] text-dim uppercase"
+                  className="rounded-full border border-line px-2 py-1 text-[0.72rem] text-dim"
                 >
                   {platform.label}
                 </li>
@@ -68,7 +68,7 @@ export function Footer() {
 
           <div>
             <h2 className="t-label">Legal &amp; support</h2>
-            <ul className="mt-3 space-y-2 text-[0.75rem]">
+            <ul className="mt-3 space-y-2 text-[0.8rem]">
               <li>
                 <Link href="/privacy" className="text-dim transition-colors hover:text-accent">
                   Privacy
@@ -93,7 +93,7 @@ export function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="grid h-10 w-10 place-items-center border border-line text-[0.62rem] tracking-[0.1em] text-dim transition-colors hover:border-[var(--accent-line)] hover:text-accent"
+                    className="rounded-full grid h-10 w-10 place-items-center border border-line text-[0.72rem] text-dim transition-colors hover:border-[var(--accent-line)] hover:text-accent"
                   >
                     <span aria-hidden>{social.glyph}</span>
                     <span className="sr-only">{social.label}</span>
@@ -104,7 +104,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-2 border-t border-line pt-5 text-[0.65rem] tracking-[0.1em] text-faint uppercase sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-2 border-t border-line pt-5 text-[0.72rem] text-faint sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} GRIEEZBOY AIO · All rights reserved</p>
           <p>
             Fast downloads, simple tools. Respect the creators and content behind every link.

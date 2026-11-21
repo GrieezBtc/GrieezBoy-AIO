@@ -34,19 +34,19 @@ export function ErrorState({ code, message, retryable, onRetry, onDismiss }: Pro
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p
-            className="text-[0.8rem] font-bold tracking-[0.18em] uppercase"
+            className="text-[0.8rem] font-bold"
             style={{ color: "var(--danger)" }}
           >
-            <span aria-hidden>[!] </span>
+            <span aria-hidden></span>
             {ERROR_TITLES[code]}
           </p>
           <p className="mt-2 max-w-xl text-[0.82rem] leading-relaxed text-dim">
             {message}
           </p>
           {HINTS[code] ? (
-            <p className="mt-2 text-[0.7rem] text-faint">→ {HINTS[code]}</p>
+            <p className="mt-2 text-[0.8rem] text-faint">{HINTS[code]}</p>
           ) : null}
-          <p className="t-label mt-3 text-[0.55rem]">
+          <p className="t-label mt-3 text-[0.72rem]">
             code: {code} · retryable: {retryable ? "yes" : "no"}
           </p>
         </div>

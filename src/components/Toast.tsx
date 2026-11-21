@@ -21,9 +21,9 @@ type ToastContextValue = {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const TONE_STYLE: Record<ToastTone, { color: string; glyph: string; label: string }> = {
-  ok: { color: "var(--accent)", glyph: "[✓]", label: "Success" },
-  error: { color: "var(--danger)", glyph: "[!]", label: "Error" },
-  info: { color: "var(--violet)", glyph: "[i]", label: "Notice" },
+  ok: { color: "var(--accent)", glyph: "✓", label: "Success" },
+  error: { color: "var(--danger)", glyph: "!", label: "Error" },
+  info: { color: "var(--violet)", glyph: "i", label: "Notice" },
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -69,12 +69,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               {TONE_STYLE[toast.tone].glyph}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[0.72rem] font-bold tracking-[0.14em] uppercase">
+              <p className="text-[0.8rem] font-bold">
                 <span className="sr-only">{TONE_STYLE[toast.tone].label}: </span>
                 {toast.title}
               </p>
               {toast.body ? (
-                <p className="mt-1 text-[0.72rem] leading-relaxed break-words text-dim">
+                <p className="mt-1 text-[0.8rem] leading-relaxed break-words text-dim">
                   {toast.body}
                 </p>
               ) : null}

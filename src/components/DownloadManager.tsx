@@ -187,10 +187,10 @@ function DownloadCard({ entry, onClose }: { entry: Entry; onClose: () => void })
     >
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[0.72rem] font-bold tracking-[0.1em] uppercase">
+          <p className="truncate text-[0.8rem] font-bold">
             {entry.title}
           </p>
-          <p className="mt-1 text-[0.68rem] tabular-nums text-dim">{line}</p>
+          <p className="mt-1 text-[0.72rem] tabular-nums text-dim">{line}</p>
         </div>
         <button
           type="button"
@@ -204,7 +204,7 @@ function DownloadCard({ entry, onClose }: { entry: Entry; onClose: () => void })
 
       {active || status === "done" ? (
         <div
-          className="mt-2.5 h-1.5 w-full overflow-hidden border border-line"
+          className="rounded-full mt-2.5 h-1.5 w-full overflow-hidden border border-line"
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={100}
