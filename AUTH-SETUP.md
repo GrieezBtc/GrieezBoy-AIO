@@ -14,10 +14,10 @@
    (Optional) Authentication -> Sign In / Providers -> turn OFF "Confirm email" so people can use the site right after signing up.
 
 ## 2. Add the keys to Vercel
-Project Settings -> API: copy the Project URL and the anon public key.
+Supabase -> Project Settings -> API Keys: copy the Project URL and the publishable key (older projects call it the anon key).
 Vercel -> your project -> Settings -> Environment Variables (Production + Preview):
 - NEXT_PUBLIC_SUPABASE_URL
-- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 Then redeploy.
 
 ## 3. Give someone premium (after they pay you)
