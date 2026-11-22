@@ -7,9 +7,11 @@ type Props = {
   onWatch: (video: HubVideo) => void;
   onShare: (video: HubVideo) => void;
   onDownload: (video: HubVideo) => void;
+  /** guests can watch but not download */
+  downloadLocked?: boolean;
 };
 
-export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
+export function VideoCard({ video, onWatch, onShare, onDownload, downloadLocked }: Props) {
   return (
     <article className="rounded-2xl group flex flex-col border border-line bg-[var(--glass-soft)] transition-colors hover:border-[var(--accent-line)]">
       <button
@@ -83,10 +85,10 @@ export function VideoCard({ video, onWatch, onShare, onDownload }: Props) {
             type="button"
             onClick={() => onDownload(video)}
             className="btn h-10 min-h-[44px] px-2.5 text-[0.72rem]"
-            aria-label={`Download ${video.title}`}
+            aria-label={downloadLocked ? `Sign in to download ${video.title}` : `Download ${video.title}`}
           >
-            <span aria-hidden>⤓</span>
-            <span className="sr-only sm:not-sr-only">Get</span>
+            <span aria-hidden>{downloadLocked ? "🔒" : "⤓"}</span>
+            <span className="sr-only sm:not-sr-only">{downloadLocked ? "Sign in" : "Get"}</span>
           </button>
           <button
             type="button"

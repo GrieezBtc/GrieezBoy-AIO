@@ -110,6 +110,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 body {
@@ -117,7 +119,8 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100dvh;
-  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
   position: relative;
 }
 

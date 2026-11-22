@@ -40,13 +40,13 @@ export function Wordmark({
   return (
     <Link
       href={href}
-      className="group flex items-center gap-2.5 outline-offset-4"
+      className="group flex min-w-0 items-center gap-2.5 outline-offset-4"
       aria-label="GRIEEZBOY AIO — home"
     >
       <LogoGlyph size={compact ? 30 : 36} />
       <span className="flex min-w-0 flex-col leading-none">
         <span
-          className={`font-bold tracking-[-0.03em] ${compact ? "text-[0.95rem]" : "text-[1.05rem]"}`}
+          className={`truncate font-bold tracking-[-0.03em] ${compact ? "text-[0.95rem]" : "text-[1.05rem]"}`}
         >
           GRIEEZBOY
           <span className="ml-1 text-accent">AIO</span>

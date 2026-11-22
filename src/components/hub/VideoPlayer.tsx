@@ -7,6 +7,7 @@ type Props = {
   video: HubVideo;
   onClose: () => void;
   onDownload: () => void;
+  downloadLocked?: boolean;
   onShare: (video: HubVideo) => void;
 };
 
@@ -42,6 +43,7 @@ export function VideoPlayer({
   video,
   onClose,
   onDownload,
+  downloadLocked,
   onShare,
 }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -156,7 +158,8 @@ export function VideoPlayer({
               onClick={onDownload}
               className="btn btn-primary px-4 text-[0.72rem]"
             >
-              <span aria-hidden>⤓</span> Download
+              <span aria-hidden>{downloadLocked ? "🔒" : "⤓"}</span>{" "}
+              {downloadLocked ? "Sign in to download" : "Download"}
             </button>
 
             <button

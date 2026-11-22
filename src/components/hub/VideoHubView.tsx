@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDownloads } from "@/components/DownloadManager";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { safeMediaName } from "@/lib/mediaDownload";
 import { VideoCard, VideoCardSkeleton } from "@/components/hub/VideoCard";
@@ -15,6 +16,9 @@ type HubMode = "feed" | "search";
 export function VideoHubView() {
   const { push } = useToast();
   const { startDownload } = useDownloads();
+  const { configured, ready, user, status, remainingToday, openPrompt, refresh } = useAuth();
+  // guests may watch, but not download
+  const downloadLocked = configured && ready && !user;
 
   const [mode, setMode] = useState<HubMode>("feed");
   const [input, setInput] = useState("");
@@ -314,6 +318,21 @@ export function VideoHubView() {
         return;
       }
 
+      if (downloadLocked) {
+        openPrompt("login");
+        return;
+      }
+      if (configured && ready && user) {
+        if (status === "trial_expired") {
+          openPrompt("trial_expired");
+          return;
+        }
+        if (status === "trial" && remainingToday <= 0) {
+          openPrompt("daily_limit");
+          return;
+        }
+      }
+
       startDownload({
         title: video.title,
         filename: `${safeMediaName(video.title) || "youtube-video"}.mp4`,
@@ -325,6 +344,12 @@ export function VideoHubView() {
           });
 
           const payload = await response.json();
+          void refresh();
+
+          const gateCode = payload?.error?.code;
+          if (gateCode === "AUTH_REQUIRED") openPrompt("login");
+          else if (gateCode === "TRIAL_EXPIRED") openPrompt("trial_expired");
+          else if (gateCode === "DAILY_LIMIT") openPrompt("daily_limit");
 
           if (!response.ok || !payload?.success) {
             throw new Error(
@@ -356,7 +381,7 @@ export function VideoHubView() {
         },
       });
     },
-    [push, startDownload],
+    [push, startDownload, downloadLocked, configured, ready, user, status, remainingToday, openPrompt, refresh],
   );
 
   const retry = useCallback(() => {
@@ -505,6 +530,7 @@ export function VideoHubView() {
                 video={video}
                 onWatch={setActive}
                 onShare={(target) => void share(target)}
+                downloadLocked={downloadLocked}
                 onDownload={(target) => void download(target)}
               />
             ))}
@@ -538,6 +564,7 @@ export function VideoHubView() {
         <VideoPlayer
           video={active}
           onClose={() => setActive(null)}
+          downloadLocked={downloadLocked}
           onDownload={() => void download(active)}
           onShare={(video) => void share(video)}
         />

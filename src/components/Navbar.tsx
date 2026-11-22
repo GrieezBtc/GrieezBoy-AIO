@@ -34,12 +34,11 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="btn btn-ghost h-10 min-h-[40px] px-3 text-[0.72rem]"
+      className="btn btn-ghost h-10 min-h-[40px] w-10 shrink-0 px-0 text-[0.9rem]"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
       title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
     >
       <span aria-hidden>{theme === "dark" ? "◑" : "◐"}</span>
-      <span className="hidden lg:inline">{theme === "dark" ? "Dark" : "Light"}</span>
     </button>
   );
 }
@@ -116,8 +115,11 @@ export function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-line bg-[var(--panel)] shadow-[var(--glass-edge)] backdrop-blur-2xl backdrop-saturate-150">
-        <div className="mx-auto flex h-14 w-full max-w-[1400px] items-center justify-between gap-3 px-3 sm:h-16 sm:px-5 lg:px-8">
-          <Wordmark />
+        <div className="mx-auto flex h-14 w-full min-w-0 max-w-[1400px] items-center justify-between gap-2 px-3 sm:h-16 sm:px-5 lg:px-8">
+          <div className="flex min-w-0 items-center gap-2">
+            <ThemeToggle />
+            <Wordmark />
+          </div>
 
           <nav aria-label="Primary" className="hidden md:block">
             <ul className="flex items-center gap-1">
@@ -150,7 +152,7 @@ export function Navbar() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {installEvent || canShare ? (
               <button
                 type="button"
@@ -161,7 +163,6 @@ export function Navbar() {
                 {installEvent ? "Install" : "Share"}
               </button>
             ) : null}
-            <ThemeToggle />
             <AccountButton />
           </div>
         </div>
@@ -176,7 +177,7 @@ export function Navbar() {
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (
-              <li key={item.href}>
+              <li key={item.href} className="min-w-0">
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
