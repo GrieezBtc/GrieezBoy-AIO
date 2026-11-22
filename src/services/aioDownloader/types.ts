@@ -75,6 +75,9 @@ export type DownloadErrorCode =
   | "MALFORMED_RESPONSE"
   | "NO_MEDIA"
   | "NETWORK_ERROR"
+  | "AUTH_REQUIRED"
+  | "TRIAL_EXPIRED"
+  | "DAILY_LIMIT"
   | "UNKNOWN";
 
 export type NormalizedDownloadError = {

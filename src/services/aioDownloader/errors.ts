@@ -26,7 +26,7 @@ export const ERROR_CATALOG: Record<DownloadErrorCode, ErrorSpec> = {
     retryable: false,
   },
   RATE_LIMITED: {
-    message: "Too many requests right now. Wait a few seconds and re-execute.",
+    message: "Too many requests right now. Wait a few seconds and try again.",
     retryable: true,
   },
   TIMEOUT: {
@@ -54,6 +54,18 @@ export const ERROR_CATALOG: Record<DownloadErrorCode, ErrorSpec> = {
     message: "Network connection to the media engine failed.",
     retryable: true,
   },
+  AUTH_REQUIRED: {
+    message: "Create a free account to use this platform. Guests can use Snapchat and Threads.",
+    retryable: false,
+  },
+  TRIAL_EXPIRED: {
+    message: "Your free week has ended. Subscribe to premium to keep downloading.",
+    retryable: false,
+  },
+  DAILY_LIMIT: {
+    message: "You've used your 3 free downloads for today. Come back tomorrow or go premium.",
+    retryable: false,
+  },
   UNKNOWN: {
     message: "Something went wrong while processing that link.",
     retryable: true,
@@ -61,18 +73,21 @@ export const ERROR_CATALOG: Record<DownloadErrorCode, ErrorSpec> = {
 };
 
 export const ERROR_TITLES: Record<DownloadErrorCode, string> = {
-  INVALID_URL: "INVALID URL",
-  UNSUPPORTED_PLATFORM: "UNSUPPORTED PLATFORM",
-  PRIVATE_CONTENT: "PRIVATE CONTENT",
-  CONTENT_NOT_FOUND: "CONTENT NOT FOUND",
-  RATE_LIMITED: "RATE LIMITED",
-  TIMEOUT: "REQUEST TIMEOUT",
-  UPSTREAM_ERROR: "UPSTREAM FAILURE",
-  PROVIDER_QUOTA_EXCEEDED: "PROVIDER QUOTA EXCEEDED",
-  MALFORMED_RESPONSE: "MALFORMED RESPONSE",
-  NO_MEDIA: "NO MEDIA",
-  NETWORK_ERROR: "NETWORK ERROR",
-  UNKNOWN: "UNKNOWN ERROR",
+  INVALID_URL: "Invalid link",
+  UNSUPPORTED_PLATFORM: "Unsupported platform",
+  PRIVATE_CONTENT: "Private content",
+  CONTENT_NOT_FOUND: "Content not found",
+  RATE_LIMITED: "Too many requests",
+  TIMEOUT: "Request timed out",
+  UPSTREAM_ERROR: "Service unavailable",
+  PROVIDER_QUOTA_EXCEEDED: "Provider limit reached",
+  MALFORMED_RESPONSE: "Unreadable response",
+  NO_MEDIA: "No media found",
+  NETWORK_ERROR: "Network error",
+  AUTH_REQUIRED: "Sign in required",
+  TRIAL_EXPIRED: "Free trial ended",
+  DAILY_LIMIT: "Daily limit reached",
+  UNKNOWN: "Unknown error",
 };
 
 export function downloadError(

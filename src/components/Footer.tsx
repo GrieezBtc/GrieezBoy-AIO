@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { PLATFORMS } from "@/services/aioDownloader/platforms";
 import { LogoGlyph } from "@/components/Wordmark";
+import { TELEGRAM_USER, WHATSAPP_NUMBER } from "@/lib/contact";
 
 const SOCIALS = [
-  { label: "WhatsApp", href: "https://wa.me/2348107461934", glyph: "WA" },
+  { label: "WhatsApp", href: `https://wa.me/${WHATSAPP_NUMBER}`, glyph: "WA" },
   { label: "X", href: "https://x.com/grieezboy01", glyph: "X" },
-  { label: "Telegram", href: "https://t.me/grieezboy001", glyph: "TG" },
+  { label: "Telegram", href: `https://t.me/${TELEGRAM_USER}`, glyph: "TG" },
 ];
 
 export function Footer() {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useToast } from "@/components/Toast";
 import { Wordmark } from "@/components/Wordmark";
@@ -40,6 +41,28 @@ function ThemeToggle() {
       <span aria-hidden>{theme === "dark" ? "◑" : "◐"}</span>
       <span className="hidden lg:inline">{theme === "dark" ? "Dark" : "Light"}</span>
     </button>
+  );
+}
+
+function AccountButton() {
+  const auth = useAuth();
+  if (!auth.configured || !auth.ready) return null;
+  if (auth.user) {
+    return (
+      <button
+        type="button"
+        onClick={() => void auth.signOut()}
+        className="btn btn-ghost h-10 min-h-[40px] px-3 text-[0.75rem]"
+        title={auth.user.email ?? "Signed in"}
+      >
+        Sign out
+      </button>
+    );
+  }
+  return (
+    <Link href="/login" className="btn btn-primary h-10 min-h-[40px] px-4 text-[0.78rem]">
+      Sign in
+    </Link>
   );
 }
 
@@ -139,6 +162,7 @@ export function Navbar() {
               </button>
             ) : null}
             <ThemeToggle />
+            <AccountButton />
           </div>
         </div>
       </header>

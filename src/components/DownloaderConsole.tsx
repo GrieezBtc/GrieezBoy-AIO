@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AccessBanner } from "@/components/AccessBanner";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { isGuestPlatform } from "@/lib/access";
 import { DownloadResult } from "@/components/DownloadResult";
 import { ErrorState } from "@/components/ErrorState";
 import { LoadingState, type Stage } from "@/components/LoadingState";
@@ -10,7 +13,7 @@ import { useToast } from "@/components/Toast";
 import { UrlInput } from "@/components/UrlInput";
 import { addHistory, readHistory, type HistoryEntry } from "@/lib/history";
 import { relativeTime } from "@/lib/format";
-import { detectPlatform, parseHttpUrl, PLATFORM_MAP } from "@/services/aioDownloader/platforms";
+import { detectPlatform, parseHttpUrl, PLATFORM_MAP, PLATFORMS } from "@/services/aioDownloader/platforms";
 import type {
   AioResponse,
   NormalizedDownloadError,
@@ -22,6 +25,8 @@ const STATUS_IDLE = "Ready — paste a link to begin";
 
 export function DownloaderConsole() {
   const { push } = useToast();
+  const auth = useAuth();
+  const { configured, ready, user, status, remainingToday, openPrompt, refresh } = auth;
   const [url, setUrl] = useState("");
   const [selected, setSelected] = useState<SupportedPlatform | "auto">("auto");
   const [stage, setStage] = useState<Stage>("idle");
@@ -100,6 +105,22 @@ export function DownloaderConsole() {
         return;
       }
 
+      // Friendly early checks. The server enforces the same rules, so these only save a request.
+      if (configured && ready) {
+        if (!user && !isGuestPlatform(platform)) {
+          openPrompt("login");
+          return;
+        }
+        if (user && status === "trial_expired") {
+          openPrompt("trial_expired");
+          return;
+        }
+        if (user && status === "trial" && remainingToday <= 0) {
+          openPrompt("daily_limit");
+          return;
+        }
+      }
+
       const requestKey = `${platform}|${parsed.toString()}`;
       if (inFlightRef.current === requestKey) return;
       inFlightRef.current = requestKey;
@@ -123,7 +144,20 @@ export function DownloaderConsole() {
         const payload = (await response.json()) as AioResponse;
         window.clearTimeout(toProcessing);
 
+        if (!payload.success) {
+          const gateCode = payload.error.code;
+          if (gateCode === "AUTH_REQUIRED" || gateCode === "TRIAL_EXPIRED" || gateCode === "DAILY_LIMIT") {
+            setStage("idle");
+            openPrompt(
+              gateCode === "AUTH_REQUIRED" ? "login" : gateCode === "TRIAL_EXPIRED" ? "trial_expired" : "daily_limit",
+            );
+            void refresh();
+            return;
+          }
+        }
+
         if (payload.success) {
+          void refresh();
           setResult(payload);
           setStage("ready");
           addHistory({
@@ -169,7 +203,7 @@ export function DownloaderConsole() {
         inFlightRef.current = null;
       }
     },
-    [url, selected, push],
+    [url, selected, push, configured, ready, user, status, remainingToday, openPrompt, refresh],
   );
 
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -219,7 +253,15 @@ export function DownloaderConsole() {
         statusLine={statusLine}
       />
 
+      <AccessBanner />
+
       <PlatformSelector
+        lockedIds={
+          configured && ready && !user
+            ? PLATFORMS.filter((p) => !isGuestPlatform(p.id)).map((p) => p.id)
+            : []
+        }
+        onLockedSelect={() => openPrompt("login")}
         detected={detected}
         selected={selected}
         onSelect={setSelected}

@@ -1,4 +1,5 @@
 import { clientKey, rateLimit } from "@/lib/rateLimit";
+import { gateDownload } from "@/lib/gate";
 import { cacheGet, cacheSet } from "@/lib/serverCache";
 import { resolveDownload } from "@/services/aioDownloader/client";
 import { downloadError } from "@/services/aioDownloader/errors";
@@ -25,6 +26,9 @@ const STATUS_BY_CODE: Record<string, number> = {
   PRIVATE_CONTENT: 403,
   CONTENT_NOT_FOUND: 404,
   RATE_LIMITED: 429,
+  AUTH_REQUIRED: 401,
+  TRIAL_EXPIRED: 402,
+  DAILY_LIMIT: 429,
   PROVIDER_QUOTA_EXCEEDED: 503,
   TIMEOUT: 504,
   NO_MEDIA: 404,
@@ -73,6 +77,16 @@ export async function POST(request: Request) {
   const resolvedPlatform = requested ?? detectPlatform(parsed.toString());
   if (!resolvedPlatform) return respond(downloadError("UNSUPPORTED_PLATFORM"));
 
+  // Gate on BOTH the claimed platform and the platform the link really belongs to,
+  // so a guest cannot send platform:"snapchat" with a YouTube link.
+  const actualPlatform = detectPlatform(parsed.toString());
+  const gate = await gateDownload(
+    actualPlatform && actualPlatform !== resolvedPlatform
+      ? [resolvedPlatform, actualPlatform]
+      : [resolvedPlatform],
+  );
+  if (!gate.ok) return respond(gate.error);
+
   const cacheKey = `aio:${resolvedPlatform}:${parsed.toString()}`;
   const cached = await cacheGet<AioResponse>(cacheKey);
   if (cached && cached.success) return respond(cached);
@@ -82,6 +96,8 @@ export async function POST(request: Request) {
     platform: resolvedPlatform,
     signal: request.signal,
   });
+
+  if (!result.success) await gate.refund();
 
   if (result.success) {
     // Short TTL: many providers hand out expiring URLs.

@@ -7,6 +7,7 @@ import {
   ThemeProvider,
   themeBootstrapScript,
 } from "@/components/providers/ThemeProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { DownloadProvider } from "@/components/DownloadManager";
 import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="antialiased">
         <ThemeProvider>
           <ToastProvider>
+            <AuthProvider>
             <DownloadProvider>
             <a
               href="#main"
@@ -76,6 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Footer />
             <PwaRegister />
             </DownloadProvider>
+            </AuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

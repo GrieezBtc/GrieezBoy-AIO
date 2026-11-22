@@ -8,9 +8,19 @@ type Props = {
   selected: SupportedPlatform | "auto";
   onSelect: (value: SupportedPlatform | "auto") => void;
   disabled?: boolean;
+  /** platforms the visitor cannot use yet (shown with a lock) */
+  lockedIds?: SupportedPlatform[];
+  onLockedSelect?: (value: SupportedPlatform) => void;
 };
 
-export function PlatformSelector({ detected, selected, onSelect, disabled }: Props) {
+export function PlatformSelector({
+  detected,
+  selected,
+  onSelect,
+  disabled,
+  lockedIds = [],
+  onLockedSelect,
+}: Props) {
   const items: Array<{
     id: SupportedPlatform | "auto";
     label: string;
@@ -62,7 +72,8 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
         {items.map((item) => {
           const isSelected = selected === item.id;
           const isDetected = detected !== null && item.id === detected;
-          const highlight = isSelected || (selected === "auto" && isDetected);
+          const locked = item.id !== "auto" && lockedIds.includes(item.id);
+          const highlight = !locked && (isSelected || (selected === "auto" && isDetected));
           return (
             <button
               key={item.id}
@@ -70,8 +81,11 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
               role="radio"
               aria-checked={isSelected}
               disabled={disabled}
-              onClick={() => onSelect(item.id)}
-              className="rounded-2xl group relative flex min-h-[64px] w-[116px] shrink-0 snap-start flex-col items-start justify-between gap-1 border px-3 py-2.5 text-left transition-all duration-150 disabled:opacity-50 sm:w-auto"
+              onClick={() => {
+                if (locked && item.id !== "auto") onLockedSelect?.(item.id);
+                else onSelect(item.id);
+              }}
+              className={`rounded-2xl group relative flex min-h-[64px] w-[116px] shrink-0 snap-start flex-col items-start justify-between gap-1 border px-3 py-2.5 text-left transition-all duration-150 disabled:opacity-50 sm:w-auto ${locked ? "opacity-60" : ""}`}
               style={{
                 borderColor: highlight ? item.accent : "var(--line)",
                 background: highlight
@@ -87,7 +101,11 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
                 >
                   {item.short}
                 </span>
-                {isDetected ? (
+                {locked ? (
+                  <span aria-hidden className="text-[0.72rem]">
+                    🔒
+                  </span>
+                ) : isDetected ? (
                   <span
                     aria-hidden
                     className="live-dot h-1.5 w-1.5 rounded-full"
@@ -100,6 +118,7 @@ export function PlatformSelector({ detected, selected, onSelect, disabled }: Pro
               </span>
               <span className="t-label text-[0.72rem]">{item.hint}</span>
               {isDetected ? <span className="sr-only">detected from URL</span> : null}
+              {locked ? <span className="sr-only">locked, sign in required</span> : null}
             </button>
           );
         })}
