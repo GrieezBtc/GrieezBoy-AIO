@@ -6,10 +6,10 @@ export const metadata: Metadata = {
 };
 
 const POINTS = [
-  ["No accounts", "There is no sign-up, no profile and no identity attached to a request."],
+  ["Accounts", "If you create an account we store your email, when your free trial ends, your premium status and how many links you processed each day. Guests can use parts of the site without an account."],
   ["Local history", "Your activity log lives in this browser's localStorage. It is never transmitted and can be wiped from the Activity Log page."],
   ["Request handling", "Submitted links are forwarded server-side to the media provider only to resolve download options. Normalized results may be cached briefly to reduce upstream load."],
-  ["No third-party trackers", "No analytics scripts, no advertising pixels, no fingerprinting."],
+  ["Anonymous usage counts", "We count page views, downloads by platform, country and device type using a random anonymous ID kept in your browser. No IP address is stored. We also use Cloudflare Web Analytics for aggregate traffic numbers. There are no advertising pixels and no fingerprinting."],
   ["Credentials", "API keys are read from server environment variables and never exposed to the browser."],
 ];
 

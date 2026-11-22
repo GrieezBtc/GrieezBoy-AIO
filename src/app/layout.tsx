@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Analytics } from "@/components/Analytics";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { PwaRegister } from "@/components/PwaRegister";
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </main>
             <Footer />
             <PwaRegister />
+            <Analytics />
             </DownloadProvider>
             </AuthProvider>
           </ToastProvider>

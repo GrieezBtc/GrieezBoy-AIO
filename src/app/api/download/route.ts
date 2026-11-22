@@ -1,5 +1,7 @@
 import { clientKey, rateLimit } from "@/lib/rateLimit";
+import { after } from "next/server";
 import { gateDownload } from "@/lib/gate";
+import { requestContext } from "@/lib/track";
 import { cacheGet, cacheSet } from "@/lib/serverCache";
 import { resolveDownload } from "@/services/aioDownloader/client";
 import { downloadError } from "@/services/aioDownloader/errors";
@@ -84,12 +86,19 @@ export async function POST(request: Request) {
     actualPlatform && actualPlatform !== resolvedPlatform
       ? [resolvedPlatform, actualPlatform]
       : [resolvedPlatform],
+    requestContext(request),
   );
-  if (!gate.ok) return respond(gate.error);
+  if (!gate.ok) {
+    after(() => gate.log("blocked", { code: gate.error.error.code, platform: resolvedPlatform }));
+    return respond(gate.error);
+  }
 
   const cacheKey = `aio:${resolvedPlatform}:${parsed.toString()}`;
   const cached = await cacheGet<AioResponse>(cacheKey);
-  if (cached && cached.success) return respond(cached);
+  if (cached && cached.success) {
+    after(() => gate.log("download", { platform: resolvedPlatform }));
+    return respond(cached);
+  }
 
   const result = await resolveDownload({
     url: parsed.toString(),
@@ -98,6 +107,12 @@ export async function POST(request: Request) {
   });
 
   if (!result.success) await gate.refund();
+  after(() =>
+    gate.log(result.success ? "download" : "download_failed", {
+      platform: resolvedPlatform,
+      ...(result.success ? {} : { code: result.error.code }),
+    }),
+  );
 
   if (result.success) {
     // Short TTL: many providers hand out expiring URLs.
