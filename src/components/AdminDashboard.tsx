@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { AdminUsers } from "@/components/AdminUsers";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 
@@ -143,6 +144,8 @@ export function AdminDashboard() {
 
       {stats ? (
         <>
+          <AdminUsers />
+
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Card label="Page views" value={stats.visits} />
             <Card label="Unique visitors" value={stats.visitors} />

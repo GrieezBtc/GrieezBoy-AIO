@@ -25,6 +25,9 @@ Supabase -> Table Editor -> `profiles` -> find their email:
 - add coins: edit the `coins` number (e.g. 10 -> 60)
 - premium: set `premium_until` to a future date (clear it to remove premium)
 
+## Admin tools (run `supabase/admin_tools.sql` once)
+Gives /admin a user search by email and a "send coins" form. Every change is logged under "Recent coin changes".
+
 ## Coins (run `supabase/coins.sql` once, after schema.sql)
 Run it BEFORE deploying the coin update, otherwise the site cannot read balances.
 
