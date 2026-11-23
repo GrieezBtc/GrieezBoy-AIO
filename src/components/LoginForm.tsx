@@ -131,7 +131,7 @@ export function LoginForm() {
 
       {mode === "signup" ? (
         <p className="text-[0.78rem] leading-relaxed text-faint">
-          Your account includes a 7-day free trial with 3 downloads a day.
+          New accounts start with 10 🪙 free coins. Each successful download costs 1 coin.
         </p>
       ) : null}
     </form>

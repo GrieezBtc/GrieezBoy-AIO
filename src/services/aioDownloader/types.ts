@@ -76,6 +76,7 @@ export type DownloadErrorCode =
   | "NO_MEDIA"
   | "NETWORK_ERROR"
   | "AUTH_REQUIRED"
+  | "NO_COINS"
   | "TRIAL_EXPIRED"
   | "DAILY_LIMIT"
   | "UNKNOWN";

@@ -2,59 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { useTheme } from "@/components/providers/ThemeProvider";
-import { useToast } from "@/components/Toast";
+import { SideNav } from "@/components/SideNav";
 import { Wordmark } from "@/components/Wordmark";
 
 type NavItem = { href: string; label: string; glyph: string };
 
+// Report an issue, theme, install and share now live in the side menu.
 const NAV: NavItem[] = [
   { href: "/", label: "Downloader", glyph: "⌘" },
   { href: "/video-hub", label: "Video Hub", glyph: "▤" },
   { href: "/history", label: "History", glyph: "◷" },
   { href: "/about", label: "About", glyph: "ⓘ" },
-  { href: "/contact", label: "Report", glyph: "⚑" },
 ];
-
-type InstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-};
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname.startsWith(href);
 }
 
-function ThemeToggle() {
-  const { theme, toggle } = useTheme();
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      className="btn btn-ghost h-10 min-h-[40px] w-10 shrink-0 px-0 text-[0.9rem]"
-      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-      title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-    >
-      <span aria-hidden>{theme === "dark" ? "◑" : "◐"}</span>
-    </button>
-  );
-}
-
-function AccountButton() {
+function AccountArea({ onOpenMenu }: { onOpenMenu: () => void }) {
   const auth = useAuth();
   if (!auth.configured || !auth.ready) return null;
   if (auth.user) {
     return (
       <button
         type="button"
-        onClick={() => void auth.signOut()}
-        className="btn btn-ghost h-10 min-h-[40px] px-3 text-[0.75rem]"
-        title={auth.user.email ?? "Signed in"}
+        onClick={onOpenMenu}
+        className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-[var(--glass-soft)] px-3.5 text-[0.82rem] font-semibold tabular-nums"
+        aria-label={auth.status === "premium" ? "Premium account, open menu" : `${auth.coins} coins, open menu`}
       >
-        Sign out
+        {auth.status === "premium" ? "👑 Premium" : `🪙 ${auth.coins.toLocaleString()}`}
       </button>
     );
   }
@@ -67,57 +46,27 @@ function AccountButton() {
 
 export function Navbar() {
   const pathname = usePathname() ?? "/";
-  const { push } = useToast();
-  const [installEvent, setInstallEvent] = useState<InstallPromptEvent | null>(null);
-  const [canShare, setCanShare] = useState(false);
-
-  useEffect(() => {
-    const onPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallEvent(event as InstallPromptEvent);
-    };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    setCanShare(typeof navigator !== "undefined" && "share" in navigator);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
-  }, []);
-
-  const onInstallOrShare = async () => {
-    if (installEvent) {
-      await installEvent.prompt();
-      const choice = await installEvent.userChoice;
-      if (choice.outcome === "accepted") {
-        push({ title: "Installed", body: "GRIEEZBOY AIO added to your device.", tone: "ok" });
-      }
-      setInstallEvent(null);
-      return;
-    }
-    const nav: Navigator = navigator;
-    if (typeof nav.share === "function") {
-      try {
-        await nav.share({
-          title: "GRIEEZBOY AIO",
-          text: "Multi-source media engine",
-          url: window.location.origin,
-        });
-      } catch {
-        /* user cancelled */
-      }
-      return;
-    }
-    try {
-      await nav.clipboard.writeText(window.location.origin);
-      push({ title: "Link copied", body: window.location.origin, tone: "ok" });
-    } catch {
-      push({ title: "Copy failed", body: "Clipboard unavailable in this browser.", tone: "error" });
-    }
-  };
+  const [menuOpen, setMenuOpen] = useState(false);
+  const openMenu = useCallback(() => setMenuOpen(true), []);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-line bg-[var(--panel)] shadow-[var(--glass-edge)] backdrop-blur-2xl backdrop-saturate-150">
         <div className="mx-auto flex h-14 w-full min-w-0 max-w-[1400px] items-center justify-between gap-2 px-3 sm:h-16 sm:px-5 lg:px-8">
           <div className="flex min-w-0 items-center gap-2">
-            <ThemeToggle />
+            <button
+              type="button"
+              onClick={openMenu}
+              aria-label="Open menu"
+              aria-haspopup="dialog"
+              aria-expanded={menuOpen}
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-[var(--glass-soft)]"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
             <Wordmark />
           </div>
 
@@ -153,27 +102,19 @@ export function Navbar() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
-            {installEvent || canShare ? (
-              <button
-                type="button"
-                onClick={onInstallOrShare}
-                className="btn btn-ghost hidden h-10 min-h-[40px] px-3 text-[0.72rem] sm:inline-flex"
-              >
-                <span aria-hidden>{installEvent ? "⤓" : "↗"}</span>
-                {installEvent ? "Install" : "Share"}
-              </button>
-            ) : null}
-            <AccountButton />
+            <AccountArea onOpenMenu={openMenu} />
           </div>
         </div>
       </header>
+
+      <SideNav open={menuOpen} onClose={closeMenu} />
 
       {/* mobile bottom navigation */}
       <nav
         aria-label="Primary mobile"
         className="fixed inset-x-0 bottom-0 z-[100] w-full rounded-t-3xl border-t border-line bg-[var(--panel)] shadow-[var(--glass-edge)] pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-150 md:hidden"
       >
-        <ul className="mx-auto grid w-full max-w-lg grid-cols-5">
+        <ul className="mx-auto grid w-full max-w-lg grid-cols-4">
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (

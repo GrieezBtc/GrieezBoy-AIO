@@ -26,7 +26,7 @@ const STATUS_IDLE = "Ready — paste a link to begin";
 export function DownloaderConsole() {
   const { push } = useToast();
   const auth = useAuth();
-  const { configured, ready, user, status, remainingToday, openPrompt, refresh } = auth;
+  const { configured, ready, user, status, coins, coinsKnown, openPrompt, refresh } = auth;
   const [url, setUrl] = useState("");
   const [selected, setSelected] = useState<SupportedPlatform | "auto">("auto");
   const [stage, setStage] = useState<Stage>("idle");
@@ -111,12 +111,8 @@ export function DownloaderConsole() {
           openPrompt("login");
           return;
         }
-        if (user && status === "trial_expired") {
-          openPrompt("trial_expired");
-          return;
-        }
-        if (user && status === "trial" && remainingToday <= 0) {
-          openPrompt("daily_limit");
+        if (user && status === "member" && coinsKnown && coins <= 0) {
+          openPrompt("no_coins");
           return;
         }
       }
@@ -146,11 +142,9 @@ export function DownloaderConsole() {
 
         if (!payload.success) {
           const gateCode = payload.error.code;
-          if (gateCode === "AUTH_REQUIRED" || gateCode === "TRIAL_EXPIRED" || gateCode === "DAILY_LIMIT") {
+          if (gateCode === "AUTH_REQUIRED" || gateCode === "NO_COINS") {
             setStage("idle");
-            openPrompt(
-              gateCode === "AUTH_REQUIRED" ? "login" : gateCode === "TRIAL_EXPIRED" ? "trial_expired" : "daily_limit",
-            );
+            openPrompt(gateCode === "AUTH_REQUIRED" ? "login" : "no_coins");
             void refresh();
             return;
           }
@@ -203,7 +197,7 @@ export function DownloaderConsole() {
         inFlightRef.current = null;
       }
     },
-    [url, selected, push, configured, ready, user, status, remainingToday, openPrompt, refresh],
+    [url, selected, push, configured, ready, user, status, coins, coinsKnown, openPrompt, refresh],
   );
 
   useEffect(() => () => abortRef.current?.abort(), []);

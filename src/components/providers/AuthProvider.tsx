@@ -11,10 +11,10 @@ import {
   type ReactNode,
 } from "react";
 import { AccessDialog, type PromptKind } from "@/components/AccessDialog";
-import { DAILY_LIMIT, TRIAL_DAYS, type AccessStatus } from "@/lib/access";
+import type { AccessStatus } from "@/lib/access";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 
-type Profile = { trial_ends_at: string; premium_until: string | null };
+type Profile = { coins: number; premium_until: string | null };
 
 type AuthContextValue = {
   /** false until the first session check finished */
@@ -23,9 +23,10 @@ type AuthContextValue = {
   configured: boolean;
   user: User | null;
   status: AccessStatus;
-  trialDaysLeft: number;
-  usedToday: number;
-  remainingToday: number;
+  /** coin balance 🪙 (premium users still have a balance but do not spend it) */
+  coins: number;
+  /** false while the profile is still loading (or could not be read) */
+  coinsKnown: boolean;
   premiumUntil: string | null;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -34,41 +35,25 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function lagosToday(): string {
-  // en-CA formats as YYYY-MM-DD
-  return new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Lagos" });
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(() => getSupabaseBrowser(), []);
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [usedToday, setUsedToday] = useState(0);
   const [prompt, setPrompt] = useState<PromptKind | null>(null);
 
   const loadAccount = useCallback(
     async (nextUser: User | null) => {
       if (!supabase || !nextUser) {
         setProfile(null);
-        setUsedToday(0);
         return;
       }
-      const [profileRes, usageRes] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("trial_ends_at, premium_until")
-          .eq("id", nextUser.id)
-          .maybeSingle(),
-        supabase
-          .from("usage")
-          .select("count")
-          .eq("user_id", nextUser.id)
-          .eq("day", lagosToday())
-          .maybeSingle(),
-      ]);
-      setProfile((profileRes.data as Profile | null) ?? null);
-      setUsedToday((usageRes.data as { count: number } | null)?.count ?? 0);
+      const { data } = await supabase
+        .from("profiles")
+        .select("coins, premium_until")
+        .eq("id", nextUser.id)
+        .maybeSingle();
+      setProfile((data as Profile | null) ?? null);
     },
     [supabase],
   );
@@ -112,33 +97,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
-    setUsedToday(0);
   }, [supabase]);
 
   const value = useMemo<AuthContextValue>(() => {
-    const now = Date.now();
     const premiumUntil = profile?.premium_until ?? null;
-    const isPremium = premiumUntil !== null && new Date(premiumUntil).getTime() > now;
-    const trialEnd = profile ? new Date(profile.trial_ends_at).getTime() : now + TRIAL_DAYS * 86_400_000;
-    const trialActive = trialEnd > now;
+    const isPremium = premiumUntil !== null && new Date(premiumUntil).getTime() > Date.now();
 
     let status: AccessStatus = "guest";
-    if (user) status = isPremium ? "premium" : trialActive ? "trial" : "trial_expired";
+    if (user) status = isPremium ? "premium" : "member";
 
     return {
       ready,
       configured: supabase !== null,
       user,
       status,
-      trialDaysLeft: Math.max(0, Math.ceil((trialEnd - now) / 86_400_000)),
-      usedToday,
-      remainingToday: Math.max(0, DAILY_LIMIT - usedToday),
+      coins: profile?.coins ?? 0,
+      coinsKnown: profile !== null,
       premiumUntil,
       refresh,
       signOut,
       openPrompt: setPrompt,
     };
-  }, [ready, supabase, user, profile, usedToday, refresh, signOut]);
+  }, [ready, supabase, user, profile, refresh, signOut]);
 
   return (
     <AuthContext.Provider value={value}>

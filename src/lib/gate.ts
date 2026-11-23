@@ -63,6 +63,7 @@ export async function gateDownload(
 
   const result = data as { allowed: boolean; reason: string; ticket?: string };
   if (!result.allowed) {
+    if (result.reason === "no_coins") return blocked("NO_COINS");
     if (result.reason === "trial_expired") return blocked("TRIAL_EXPIRED");
     if (result.reason === "daily_limit") return blocked("DAILY_LIMIT");
     return blocked("AUTH_REQUIRED");

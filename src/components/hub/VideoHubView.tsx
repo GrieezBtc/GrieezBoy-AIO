@@ -16,7 +16,7 @@ type HubMode = "feed" | "search";
 export function VideoHubView() {
   const { push } = useToast();
   const { startDownload } = useDownloads();
-  const { configured, ready, user, status, remainingToday, openPrompt, refresh } = useAuth();
+  const { configured, ready, user, status, coins, coinsKnown, openPrompt, refresh } = useAuth();
   // guests may watch, but not download
   const downloadLocked = configured && ready && !user;
 
@@ -323,12 +323,8 @@ export function VideoHubView() {
         return;
       }
       if (configured && ready && user) {
-        if (status === "trial_expired") {
-          openPrompt("trial_expired");
-          return;
-        }
-        if (status === "trial" && remainingToday <= 0) {
-          openPrompt("daily_limit");
+        if (status === "member" && coinsKnown && coins <= 0) {
+          openPrompt("no_coins");
           return;
         }
       }
@@ -348,8 +344,7 @@ export function VideoHubView() {
 
           const gateCode = payload?.error?.code;
           if (gateCode === "AUTH_REQUIRED") openPrompt("login");
-          else if (gateCode === "TRIAL_EXPIRED") openPrompt("trial_expired");
-          else if (gateCode === "DAILY_LIMIT") openPrompt("daily_limit");
+          else if (gateCode === "NO_COINS") openPrompt("no_coins");
 
           if (!response.ok || !payload?.success) {
             throw new Error(
@@ -381,7 +376,7 @@ export function VideoHubView() {
         },
       });
     },
-    [push, startDownload, downloadLocked, configured, ready, user, status, remainingToday, openPrompt, refresh],
+    [push, startDownload, downloadLocked, configured, ready, user, status, coins, coinsKnown, openPrompt, refresh],
   );
 
   const retry = useCallback(() => {

@@ -12,7 +12,7 @@ export default function LoginPage() {
       <section className="panel p-5 sm:p-7">
         <h1 className="text-2xl font-bold tracking-tight">Welcome</h1>
         <p className="mt-1.5 mb-6 text-[0.85rem] text-dim">
-          Sign in to unlock every platform. New accounts get a free week.
+          Sign in to unlock every platform. New accounts start with 10 🪙 free coins.
         </p>
         <LoginForm />
       </section>

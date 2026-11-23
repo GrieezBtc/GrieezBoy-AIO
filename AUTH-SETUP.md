@@ -1,10 +1,10 @@
 # Accounts, free trial and premium — setup
 
 ## How it works
-- No account: Video Hub + Snapchat + Threads only. Other platforms show a lock.
-- Account: 7-day free trial, every platform, 3 links per day (resets at midnight Nigerian time).
-- After the trial, or after 3 links in a day: a popup sends them to WhatsApp / Telegram to subscribe.
-- Premium: unlimited. You switch it on by hand (below).
+- No account: Video Hub (watch only) + Snapchat + Threads. Other platforms show a lock.
+- Account: starts with 10 coins. Every successful download costs 1 coin. Failed lookups are free.
+- Out of coins: a popup sends them to WhatsApp / Telegram to buy more coins or go premium.
+- Premium: unlimited, no coins spent. You switch it on by hand (below).
 - If the two Supabase variables are missing, the site behaves exactly as before.
 
 ## 1. Create the Supabase project (free)
@@ -20,12 +20,15 @@ Vercel -> your project -> Settings -> Environment Variables (Production + Previe
 - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 Then redeploy.
 
-## 3. Give someone premium (after they pay you)
-Supabase -> Table Editor -> `profiles` -> find their email -> set `premium_until` to a date
-(e.g. 30 days from today). Clear it to remove premium. It works from the phone browser too.
-To extend someone's free trial, edit `trial_ends_at` the same way.
+## 3. After someone pays you
+Supabase -> Table Editor -> `profiles` -> find their email:
+- add coins: edit the `coins` number (e.g. 10 -> 60)
+- premium: set `premium_until` to a future date (clear it to remove premium)
+
+## Coins (run `supabase/coins.sql` once, after schema.sql)
+Run it BEFORE deploying the coin update, otherwise the site cannot read balances.
 
 ## Change the numbers
-- Daily limit: `v_limit` in `consume_download()` in schema.sql (re-run that function) and `DAILY_LIMIT` in `src/lib/access.ts`.
+- Starter coins: `default 10` in `supabase/coins.sql` (only affects new accounts) and `WELCOME_COINS` in `src/lib/access.ts`.
 - Free platforms for guests: `GUEST_PLATFORMS` in `src/lib/access.ts`.
 - WhatsApp / Telegram: `src/lib/contact.ts`.

@@ -58,6 +58,10 @@ export const ERROR_CATALOG: Record<DownloadErrorCode, ErrorSpec> = {
     message: "Create a free account to use this platform. Guests can use Snapchat and Threads.",
     retryable: false,
   },
+  NO_COINS: {
+    message: "You're out of coins 🪙. Top up or go premium to keep downloading.",
+    retryable: false,
+  },
   TRIAL_EXPIRED: {
     message: "Your free week has ended. Subscribe to premium to keep downloading.",
     retryable: false,
@@ -85,6 +89,7 @@ export const ERROR_TITLES: Record<DownloadErrorCode, string> = {
   NO_MEDIA: "No media found",
   NETWORK_ERROR: "Network error",
   AUTH_REQUIRED: "Sign in required",
+  NO_COINS: "Out of coins",
   TRIAL_EXPIRED: "Free trial ended",
   DAILY_LIMIT: "Daily limit reached",
   UNKNOWN: "Unknown error",
