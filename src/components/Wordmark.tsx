@@ -4,28 +4,33 @@ export function LogoGlyph({ size = 34 }: { size?: number }) {
   return (
     <span
       aria-hidden
-      className="rounded-2xl relative grid shrink-0 place-items-center border"
+      className="relative grid shrink-0 place-items-center overflow-hidden"
       style={{
         width: size,
         height: size,
-        borderColor: "var(--accent-line)",
-        background:
-          "linear-gradient(140deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%)",
+        borderRadius: size * 0.3,
+        background: "linear-gradient(145deg, var(--accent), var(--accent-2))",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 0 rgba(255,255,255,0.12), 0 6px 18px -8px var(--accent)",
       }}
     >
-      <svg width={size * 0.56} height={size * 0.56} viewBox="0 0 24 24" fill="none">
+      <span
+        className="absolute inset-x-0 top-0"
+        style={{
+          height: "48%",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0))",
+        }}
+      />
+      <svg width={size * 0.56} height={size * 0.56} viewBox="0 0 24 24" fill="none" className="relative">
         <path
-          d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"
-          stroke="var(--accent)"
-          strokeWidth="1.4"
+          d="M12 4v10m0 0 4-4m-4 4-4-4"
+          stroke="#fff"
+          strokeWidth="2.4"
+          strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path d="M12 8v8m0 0 3.2-3.2M12 16l-3.2-3.2" stroke="var(--accent)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6.5 19h11" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
       </svg>
-      <span
-        className="absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full"
-        style={{ background: "var(--accent)" }}
-      />
     </span>
   );
 }

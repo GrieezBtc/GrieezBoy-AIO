@@ -1,5 +1,5 @@
 /* GRIEEZBOY AIO service worker — progressive enhancement only. */
-const CACHE = "griezboy-shell-v2";
+const CACHE = "griezboy-shell-v3";
 const SHELL = ["/", "/video-hub", "/history", "/about", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
