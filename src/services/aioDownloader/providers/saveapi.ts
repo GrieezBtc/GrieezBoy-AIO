@@ -37,17 +37,42 @@ export async function resolveSaveApi(
     const endpoint = new URL(ENDPOINT);
     endpoint.searchParams.set("url", url);
 
-    const response = await fetch(endpoint.toString(), {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        accept: "application/json",
-      },
-      signal: controller.signal,
-      cache: "no-store",
-    });
+    const shortUrl = url.length > 90 ? `${url.slice(0, 90)}…` : url;
+    let response: Response | null = null;
+    let body: unknown = null;
 
-    const body = await readBody(response);
+    // One retry for failures that are usually temporary on the provider's side.
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        response = await fetch(endpoint.toString(), {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            accept: "application/json",
+          },
+          signal: controller.signal,
+          cache: "no-store",
+        });
+      } catch (fetchError) {
+        const fetchName = (fetchError as { name?: string } | null)?.name;
+        if (attempt === 1 && fetchName !== "AbortError" && fetchName !== "TimeoutError") {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          continue;
+        }
+        throw fetchError;
+      }
+
+      body = await readBody(response);
+
+      const transient =
+        response.status >= 500 ||
+        response.status === 429 ||
+        (platform === "snapchat" && response.status === 404);
+      if (response.ok || !transient || attempt === 2) break;
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
+
+    if (!response) return downloadError("NETWORK_ERROR");
 
     if (!response.ok) {
       const hint =
@@ -59,6 +84,11 @@ export async function resolveSaveApi(
           ? codeFromHttpStatus(response.status)
           : textCode;
 
+      // Shows the real reason in the Vercel logs (never shown to visitors).
+      console.error(
+        `[saveapi] ${platform} http=${response.status} -> ${code} url=${shortUrl} body=${hint.slice(0, 300)}`,
+      );
+
       return downloadError(code);
     }
 
@@ -66,10 +96,18 @@ export async function resolveSaveApi(
       return downloadError("MALFORMED_RESPONSE");
     }
 
-    return normalizeAioResponse(body, {
+    const normalized = normalizeAioResponse(body, {
       url,
       platform,
     });
+
+    if (!normalized.success) {
+      console.error(
+        `[saveapi] ${platform} ok-response -> ${normalized.error.code} url=${shortUrl} body=${JSON.stringify(body).slice(0, 300)}`,
+      );
+    }
+
+    return normalized;
   } catch (error) {
     const name = (error as { name?: string } | null)?.name;
 

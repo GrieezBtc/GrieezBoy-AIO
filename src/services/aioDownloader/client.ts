@@ -1,7 +1,7 @@
 import { downloadError } from "./errors";
 import { resolveFastSaver } from "./providers/fastsaver";
 import { resolveSaveApi } from "./providers/saveapi";
-import { detectPlatform, parseHttpUrl } from "./platforms";
+import { cleanShareUrl, detectPlatform, parseHttpUrl } from "./platforms";
 import type { AioResponse, SupportedPlatform } from "./types";
 
 export type AioRequestInput = {
@@ -42,8 +42,8 @@ export async function resolveDownload({
     return downloadError("INVALID_URL");
   }
 
-  const target = parsed.toString();
-  const detected = platform ?? detectPlatform(target);
+  const detected = platform ?? detectPlatform(parsed.toString());
+  const target = cleanShareUrl(parsed, detected ?? null).toString();
 
   if (!detected) {
     return downloadError("UNSUPPORTED_PLATFORM");

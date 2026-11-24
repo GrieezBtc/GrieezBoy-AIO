@@ -196,3 +196,29 @@ export function isSafeMediaUrl(value: unknown): value is string {
     return false;
   }
 }
+
+const SNAPCHAT_TRACKING_PARAMS = [
+  "sender_web_id",
+  "device_type",
+  "is_copy_url",
+  "share_id",
+  "locale",
+  "sid",
+  "web_client_id",
+  "ref",
+];
+
+/**
+ * Share links carry tracking parameters (?sender_web_id=...&is_copy_url=true) that
+ * providers can reject. Drop only those; the path identifies the content.
+ */
+export function cleanShareUrl(url: URL, platform: SupportedPlatform | null): URL {
+  if (platform !== "snapchat") return url;
+  const cleaned = new URL(url.toString());
+  for (const key of SNAPCHAT_TRACKING_PARAMS) cleaned.searchParams.delete(key);
+  for (const key of [...cleaned.searchParams.keys()]) {
+    if (key.toLowerCase().startsWith("utm_")) cleaned.searchParams.delete(key);
+  }
+  cleaned.hash = "";
+  return cleaned;
+}
