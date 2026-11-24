@@ -16,6 +16,8 @@ const HINTS: Partial<Record<DownloadErrorCode, string>> = {
   UNSUPPORTED_PLATFORM: "Try a link from one of the eight supported sources.",
   PRIVATE_CONTENT: "Private accounts and age-gated media cannot be resolved.",
   NO_MEDIA: "Text-only posts contain nothing to extract.",
+  CONTENT_NOT_FOUND:
+    "Open the link in your browser first. It must be public and still online. Snapchat stories vanish after 24 hours, and private snaps can't be fetched. Use a fresh public Spotlight link.",
   RATE_LIMITED: "The engine limits burst traffic to keep the queue fast.",
 };
 

@@ -37,7 +37,7 @@ export async function resolveSaveApi(
     const endpoint = new URL(ENDPOINT);
     endpoint.searchParams.set("url", url);
 
-    const shortUrl = url.length > 90 ? `${url.slice(0, 90)}…` : url;
+    const shortUrl = url.length > 220 ? `${url.slice(0, 220)}…` : url;
     let response: Response | null = null;
     let body: unknown = null;
 
@@ -64,10 +64,13 @@ export async function resolveSaveApi(
 
       body = await readBody(response);
 
+      // A clear "no post at this link" answer is final; retrying only wastes time and credits.
+      const bodyText = typeof body === "string" ? body : JSON.stringify(body ?? "");
+      const clearlyMissing = /MEDIA_NOT_FOUND|no post was found|not found/i.test(bodyText);
       const transient =
         response.status >= 500 ||
         response.status === 429 ||
-        (platform === "snapchat" && response.status === 404);
+        (platform === "snapchat" && response.status === 404 && !clearlyMissing);
       if (response.ok || !transient || attempt === 2) break;
       await new Promise((resolve) => setTimeout(resolve, 800));
     }
